@@ -27,7 +27,8 @@ public class Handler {
 
     public Mono<ServerResponse> listenSaveTask(ServerRequest serverRequest) {
         log.info("Petición recibida para registrar usuario");
-        return serverRequest.bodyToMono(UsuarioRequest.class)
+        return serverRequest
+                .bodyToMono(UsuarioRequest.class)
                 .doOnNext(req -> log.info("Request Body: {}", req))
                 .flatMap(dto -> ValidationUtil.validate(dto, validator))
                 .map(usuarioDtoMapper::toModel)
@@ -35,7 +36,8 @@ public class Handler {
                 .doOnSuccess(resp -> log.info("Usuario registrado exitosamente: {}", resp.getEmail()))
                 .doOnError(err -> log.error("Error al registrar usuario: {}", err.getMessage()))
                 .map(usuarioDtoMapper::toResponse)
-                .flatMap(savedUser -> ServerResponse.ok()
+                .flatMap(savedUser -> ServerResponse
+                        .status(201)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(savedUser));
     }

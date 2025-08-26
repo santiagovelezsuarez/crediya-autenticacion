@@ -3,9 +3,10 @@ package co.pragma.config.validators;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.common.gateways.BusinessValidator;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
-import co.pragma.usecase.usuario.criteria.validators.SalarioRangeValidator;
-import co.pragma.usecase.usuario.criteria.validators.UniqueEmailValidator;
-import co.pragma.usecase.usuario.criteria.ValidationChain;
+
+import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
+import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
+import co.pragma.usecase.usuario.businessrules.UsuarioValidationPolicy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +31,7 @@ public class RegisterUserValidatorConfig {
     @Bean
     @Primary
     public BusinessValidator<Usuario> registrationValidator(SalarioRangeValidator salaryRangeValidator, UniqueEmailValidator uniqueEmailValidator) {
-        return new ValidationChain(List.of(
+        return new UsuarioValidationPolicy(List.of(
                 salaryRangeValidator,
                 uniqueEmailValidator
         ));

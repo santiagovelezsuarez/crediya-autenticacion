@@ -1,4 +1,4 @@
-package co.pragma.usecase.usuario.criteria;
+package co.pragma.usecase.usuario.businessrules;
 
 import co.pragma.model.usuario.Usuario;
 import co.pragma.common.gateways.BusinessValidator;
@@ -7,11 +7,11 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Objects;
 
-public class ValidationChain implements BusinessValidator<Usuario> {
+public class UsuarioValidationPolicy implements BusinessValidator<Usuario> {
 
     private final List<BusinessValidator<Usuario>> validators;
 
-    public ValidationChain(List<BusinessValidator<Usuario>> validators) {
+    public UsuarioValidationPolicy(List<BusinessValidator<Usuario>> validators) {
         this.validators = Objects.requireNonNull(validators);
     }
 

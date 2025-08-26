@@ -3,7 +3,7 @@ package co.pragma.usecase.usuario.validators;
 import co.pragma.common.exception.BusinessException;
 import co.pragma.common.gateways.BusinessValidator;
 import co.pragma.model.usuario.Usuario;
-import co.pragma.usecase.usuario.criteria.ValidationChain;
+import co.pragma.usecase.usuario.businessrules.UsuarioValidationPolicy;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -26,7 +26,7 @@ public class ValidationChainTest {
         when(v1.validate(usuario)).thenReturn(Mono.just(usuario));
         when(v2.validate(usuario)).thenReturn(Mono.just(usuario));
 
-        ValidationChain chain = new ValidationChain(Arrays.asList(v1, v2));
+        UsuarioValidationPolicy chain = new UsuarioValidationPolicy(Arrays.asList(v1, v2));
 
         StepVerifier.create(chain.validate(usuario))
                 .expectNext(usuario)
@@ -49,7 +49,7 @@ public class ValidationChainTest {
         when(v1.validate(usuario)).thenReturn(Mono.error(new BusinessException("Error")));
         when(v2.validate(usuario)).thenReturn(Mono.just(usuario));
 
-        ValidationChain chain = new ValidationChain(Arrays.asList(v1, v2));
+        UsuarioValidationPolicy chain = new UsuarioValidationPolicy(Arrays.asList(v1, v2));
 
         StepVerifier.create(chain.validate(usuario))
                 .expectErrorMatches(ex -> ex instanceof BusinessException &&

@@ -3,7 +3,7 @@ package co.pragma.usecase.usuario.validators;
 import co.pragma.common.exception.BusinessException;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
-import co.pragma.usecase.usuario.criteria.validators.UniqueEmailValidator;
+import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

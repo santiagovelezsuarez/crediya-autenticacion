@@ -2,7 +2,7 @@ package co.pragma.usecase.usuario.validators;
 
 import co.pragma.common.exception.BusinessException;
 import co.pragma.model.usuario.Usuario;
-import co.pragma.usecase.usuario.criteria.validators.SalarioRangeValidator;
+import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

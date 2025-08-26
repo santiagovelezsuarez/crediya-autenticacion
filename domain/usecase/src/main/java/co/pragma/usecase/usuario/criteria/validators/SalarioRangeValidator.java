@@ -1,4 +1,4 @@
-package co.pragma.usecase.user.criteria.validators;
+package co.pragma.usecase.usuario.criteria.validators;
 
 import co.pragma.model.usuario.Usuario;
 import co.pragma.common.exception.BusinessException;
@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 
 @RequiredArgsConstructor
-public class SalaryRangeValidator implements BusinessValidator<Usuario> {
+public class SalarioRangeValidator implements BusinessValidator<Usuario> {
 
     private static final BigDecimal MIN_SALARY = BigDecimal.ZERO;
     //private static final BigDecimal MAX_SALARY = new BigDecimal("15000000");

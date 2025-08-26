@@ -1,4 +1,4 @@
-package co.pragma.usecase.user.criteria;
+package co.pragma.usecase.usuario.criteria;
 
 import co.pragma.model.usuario.Usuario;
 import co.pragma.common.gateways.BusinessValidator;

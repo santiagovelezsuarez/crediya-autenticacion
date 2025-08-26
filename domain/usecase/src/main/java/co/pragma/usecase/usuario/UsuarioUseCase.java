@@ -1,4 +1,4 @@
-package co.pragma.usecase.user;
+package co.pragma.usecase.usuario;
 
 import co.pragma.model.usuario.Usuario;
 import co.pragma.common.gateways.BusinessValidator;
@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class UserUseCase {
+public class UsuarioUseCase {
 
     private final UsuarioRepository userRepository;
 

@@ -3,8 +3,7 @@ package co.pragma.api;
 import co.pragma.api.dto.UsuarioDtoMapper;
 import co.pragma.api.dto.UsuarioRequest;
 import co.pragma.api.dto.ValidationUtil;
-import co.pragma.model.usuario.Usuario;
-import co.pragma.usecase.user.UserUseCase;
+import co.pragma.usecase.usuario.UsuarioUseCase;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class Handler {
 
-    private final UserUseCase registerUserUseCase;
+    private final UsuarioUseCase registerUserUseCase;
 
     private final UsuarioDtoMapper usuarioDtoMapper;
 

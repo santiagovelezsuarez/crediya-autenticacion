@@ -2,12 +2,18 @@ package co.pragma.api.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UsuarioRequest {
 
     @NotBlank(message = "El campo nombres no puede estar vacío")

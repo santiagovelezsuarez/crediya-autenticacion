@@ -3,9 +3,9 @@ package co.pragma.config.validators;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.common.gateways.BusinessValidator;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
-import co.pragma.usecase.user.criteria.validators.SalaryRangeValidator;
-import co.pragma.usecase.user.criteria.validators.UniqueEmailValidator;
-import co.pragma.usecase.user.criteria.ValidationChain;
+import co.pragma.usecase.usuario.criteria.validators.SalarioRangeValidator;
+import co.pragma.usecase.usuario.criteria.validators.UniqueEmailValidator;
+import co.pragma.usecase.usuario.criteria.ValidationChain;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +18,8 @@ import java.util.List;
 public class RegisterUserValidatorConfig {
 
     @Bean
-    public SalaryRangeValidator salaryRangeValidator(@Value("${validation.salary.max}") BigDecimal maxSalary) {
-        return new SalaryRangeValidator(maxSalary);
+    public SalarioRangeValidator salaryRangeValidator(@Value("${validation.salary.max}") BigDecimal maxSalary) {
+        return new SalarioRangeValidator(maxSalary);
     }
 
     @Bean
@@ -29,7 +29,7 @@ public class RegisterUserValidatorConfig {
 
     @Bean
     @Primary
-    public BusinessValidator<Usuario> registrationValidator(SalaryRangeValidator salaryRangeValidator, UniqueEmailValidator uniqueEmailValidator) {
+    public BusinessValidator<Usuario> registrationValidator(SalarioRangeValidator salaryRangeValidator, UniqueEmailValidator uniqueEmailValidator) {
         return new ValidationChain(List.of(
                 salaryRangeValidator,
                 uniqueEmailValidator

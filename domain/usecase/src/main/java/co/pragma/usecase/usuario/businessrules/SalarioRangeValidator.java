@@ -1,8 +1,8 @@
 package co.pragma.usecase.usuario.businessrules;
 
-import co.pragma.common.exception.SalaryBaseException;
+import co.pragma.base.exception.SalaryBaseException;
 import co.pragma.model.usuario.Usuario;
-import co.pragma.common.gateways.BusinessValidator;
+import co.pragma.base.gateways.BusinessValidator;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import java.math.BigDecimal;

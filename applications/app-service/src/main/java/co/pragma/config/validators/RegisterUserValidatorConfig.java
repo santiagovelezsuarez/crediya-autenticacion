@@ -1,7 +1,7 @@
 package co.pragma.config.validators;
 
 import co.pragma.model.usuario.Usuario;
-import co.pragma.common.gateways.BusinessValidator;
+import co.pragma.base.gateways.BusinessValidator;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 
 import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;

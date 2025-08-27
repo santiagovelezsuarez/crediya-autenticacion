@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Table(name = "users")
+@Table(name = "usuarios")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

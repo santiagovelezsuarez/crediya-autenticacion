@@ -19,13 +19,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MyReactiveRepositoryAdapterTest {
+class UsuarioRepositoryAdapterTest {
 
     @InjectMocks
     UsuarioReactiveRepositoryAdapter repositoryAdapter;
 
     @Mock
-    UserReactiveRepository repository;
+    UsuarioReactiveRepository repository;
 
     @Mock
     ObjectMapper mapper;

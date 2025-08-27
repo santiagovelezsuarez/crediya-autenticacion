@@ -1,7 +1,7 @@
 package co.pragma.usecase.usuario.businessrules;
 
 import co.pragma.model.usuario.Usuario;
-import co.pragma.common.gateways.BusinessValidator;
+import co.pragma.base.gateways.BusinessValidator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.util.List;

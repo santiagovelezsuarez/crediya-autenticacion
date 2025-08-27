@@ -1,6 +1,6 @@
 package co.pragma.config;
 
-import co.pragma.common.gateways.BusinessValidator;
+import co.pragma.base.gateways.BusinessValidator;
 import co.pragma.model.usuario.Usuario;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package co.pragma.usecase.usuario.validators;
 
-import co.pragma.common.exception.BusinessException;
-import co.pragma.common.gateways.BusinessValidator;
+import co.pragma.base.exception.BusinessException;
+import co.pragma.base.gateways.BusinessValidator;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.usecase.usuario.businessrules.UsuarioValidationPolicy;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,8 @@
 package co.pragma.usecase.usuario.businessrules;
 
-import co.pragma.common.exception.EmailAlreadyRegisteredException;
+import co.pragma.base.exception.EmailAlreadyRegisteredException;
 import co.pragma.model.usuario.Usuario;
-import co.pragma.common.gateways.BusinessValidator;
+import co.pragma.base.gateways.BusinessValidator;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -15,10 +15,9 @@ public class UniqueEmailValidator implements BusinessValidator<Usuario> {
     @Override
     public Mono<Usuario> validate(Usuario usuario) {
         return usuarioRepository.findByEmail(usuario.getEmail())
-                .hasElement()
-                .flatMap(exists -> Boolean.TRUE.equals(exists)
-                        ? Mono.error(new EmailAlreadyRegisteredException("El correo ya está registrado"))
-                        : Mono.just(usuario));
+                .flatMap(found -> Mono.<Usuario>error(new EmailAlreadyRegisteredException("El correo ya está registrado")))
+                .switchIfEmpty(Mono.just(usuario));
     }
+
 }
 

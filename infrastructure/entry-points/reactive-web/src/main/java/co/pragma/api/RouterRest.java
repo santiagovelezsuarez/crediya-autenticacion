@@ -25,7 +25,7 @@ public class RouterRest {
     @Bean
     @RouterOperations(
             @RouterOperation(
-                    path = "/api/v1/user",
+                    path = "/api/v1/usuario",
                     produces = {MediaType.APPLICATION_JSON_VALUE},
                     method = RequestMethod.POST,
                     beanClass = Handler.class,
@@ -52,7 +52,7 @@ public class RouterRest {
             )
     )
     public RouterFunction<ServerResponse> userRoutes(Handler handler) {
-        return route(POST("/api/v1/user"), handler::listenSaveTask);
+        return route(POST("/api/v1/usuario"), handler::listenSaveTask);
     }
 
     @Bean

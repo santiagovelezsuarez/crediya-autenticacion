@@ -7,7 +7,6 @@ import co.pragma.r2dbc.helper.ReactiveAdapterOperations;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -16,11 +15,11 @@ public class UsuarioReactiveRepositoryAdapter extends ReactiveAdapterOperations<
         Usuario,
         UsuarioEntity,
         String,
-        UserReactiveRepository
+        UsuarioReactiveRepository
 > implements UsuarioRepository {
 
 
-    public UsuarioReactiveRepositoryAdapter(UserReactiveRepository repository, ObjectMapper mapper) {
+    public UsuarioReactiveRepositoryAdapter(UsuarioReactiveRepository repository, ObjectMapper mapper) {
         super(repository, mapper, d -> mapper.map(d, Usuario.class));
     }
 

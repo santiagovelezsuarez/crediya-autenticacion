@@ -25,7 +25,7 @@ public class Handler {
     private final Validator validator;
 
 
-    public Mono<ServerResponse> listenSaveTask(ServerRequest serverRequest) {
+    public Mono<ServerResponse> listenRegisterUser(ServerRequest serverRequest) {
         log.info("Petición recibida para registrar usuario");
         return serverRequest
                 .bodyToMono(UsuarioRequest.class)

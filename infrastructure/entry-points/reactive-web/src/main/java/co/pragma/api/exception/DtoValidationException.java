@@ -1,6 +1,5 @@
 package co.pragma.api.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
@@ -14,10 +13,6 @@ public class DtoValidationException extends RuntimeException {
         this.errors = errors;
     }
 
-    @Getter
-    @AllArgsConstructor
-    public static class FieldError {
-        private final String field;
-        private final String message;
+    public record FieldError(String field, String message) {
     }
 }

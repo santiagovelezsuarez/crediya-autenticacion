@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import static org.mockito.Mockito.*;
 
-public class ValidationChainTest {
+class ValidationChainTest {
 
     @Test
     void shouldPassWhenAllValidatorsPass() {

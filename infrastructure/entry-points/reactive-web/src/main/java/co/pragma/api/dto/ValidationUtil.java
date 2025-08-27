@@ -23,7 +23,7 @@ public class ValidationUtil {
                             attr.getPropertyPath().toString(),
                             attr.getMessage()
                     ))
-                    .collect(Collectors.toList());
+                    .toList();
 
             return Mono.error(new DtoValidationException(errors));
         }

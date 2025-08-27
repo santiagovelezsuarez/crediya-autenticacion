@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
         log.info("DtoValidationException: {}", ex.getMessage());
 
         List<ErrorResponse.FieldError> fieldErrors = ex.getErrors().stream()
-                .map(err -> new ErrorResponse.FieldError(err.getField(), err.getMessage()))
+                .map(err -> new ErrorResponse.FieldError(err.field(), err.message()))
                 .toList();
 
         ErrorResponse response = ErrorResponse.builder()

@@ -29,7 +29,7 @@ public class RouterRest {
                     produces = {MediaType.APPLICATION_JSON_VALUE},
                     method = RequestMethod.POST,
                     beanClass = Handler.class,
-                    beanMethod = "listenSaveTask",
+                    beanMethod = "listenRegisterUser",
                     operation = @Operation(
                             operationId = "saveUser",
                             summary = "Registrar un nuevo usuario",

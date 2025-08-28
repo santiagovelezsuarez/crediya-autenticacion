@@ -1,9 +1,9 @@
 package co.pragma.api;
 
-import co.pragma.api.dto.ErrorResponse;
-import co.pragma.api.exception.DtoValidationException;
 import co.pragma.base.exception.BusinessException;
 import co.pragma.base.exception.EmailAlreadyRegisteredException;
+import common.api.dto.ErrorResponse;
+import common.api.exception.DtoValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

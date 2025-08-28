@@ -23,7 +23,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class RouterRest {
 
     @Bean
-    @RouterOperations(
+    @RouterOperations({
             @RouterOperation(
                     path = "/api/v1/usuario",
                     produces = {MediaType.APPLICATION_JSON_VALUE},
@@ -49,10 +49,34 @@ public class RouterRest {
                                     @ApiResponse(responseCode = "500", description = "Error interno del servidor")
                             }
                     )
+            ),
+            @RouterOperation(
+                    path = "/api/v1/usuario/{tipoDocumento}/{numeroDocumento}",
+                    produces = {MediaType.APPLICATION_JSON_VALUE},
+                    method = RequestMethod.GET,
+                    beanClass = Handler.class,
+                    beanMethod = "listenFindByDocumento",
+                    operation = @Operation(
+                            operationId = "FindUsuarioByDocumento",
+                            summary = "Obtener usuario por tipo y número de documento",
+                            description = "Busca un usuario en el sistema usando su tipo y número de documento",
+                            tags = {"Usuario"},
+                            responses = {
+                                    @ApiResponse(
+                                            responseCode = "200",
+                                            description = "Usuario encontrado",
+                                            content = @Content(schema = @Schema(implementation = UsuarioResponse.class))
+                                    ),
+                                    @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+                                    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+                            }
+                    )
             )
-    )
+    })
     public RouterFunction<ServerResponse> userRoutes(Handler handler) {
-        return route(POST("/api/v1/usuario"), handler::listenSaveTask);
+        return route(POST("/api/v1/usuario"), handler::listenRegisterUser)
+                .and(route(GET("/api/v1/usuario/{tipoDocumento}/{numeroDocumento}"),
+                handler::listenFindByDocumento));
     }
 
     @Bean

@@ -17,4 +17,8 @@ public class UsuarioUseCase {
         return registrationValidator.validate(user)
                 .flatMap(userRepository::save);
     }
+
+    public Mono<Usuario> findByDocumento(String numeroDocumento, String tipoDocumento) {
+        return userRepository.findByDocumento(numeroDocumento, tipoDocumento);
+    }
 }

@@ -1,5 +1,7 @@
 package co.pragma.r2dbc.entity;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -21,6 +23,9 @@ public class UsuarioEntity {
     private UUID id;
     private String nombres;
     private String apellidos;
+    @Column("tipo_documento")
+    private TipoDocumentoEnum tipoDocumento;
+    private String numeroDocumento;
     private LocalDate fechaNacimiento;
     private String direccion;
     private String telefono;

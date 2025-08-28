@@ -1,13 +1,13 @@
 package co.pragma.api.dto;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
 import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 
 @Data
@@ -21,6 +21,13 @@ public class UsuarioRequest {
 
     @NotBlank(message = "El campo apellidos no puede estar vacío")
     private String apellidos;
+
+    @NotBlank(message = "El campo tipoDocumento no puede estar vacío")
+    @Pattern(regexp = "CC|CE|PA|TI", message = "El tipo de documento no es válido. Debe ser CC, CE, PA o TI.")
+    private String tipoDocumento;
+
+    @NotBlank(message = "El campo numeroDocumento no puede estar vacío")
+    private String numeroDocumento;
 
     private String fechaNacimiento;
 

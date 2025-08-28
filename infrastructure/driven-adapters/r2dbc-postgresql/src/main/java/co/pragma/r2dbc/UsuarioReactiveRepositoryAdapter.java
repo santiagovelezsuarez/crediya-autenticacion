@@ -43,4 +43,18 @@ public class UsuarioReactiveRepositoryAdapter extends ReactiveAdapterOperations<
                 }))
                 .doOnError(e -> log.error("Error al buscar usuario {} : {}", email, e.getMessage()));
     }
+
+
+    @Override
+    public Mono<Usuario> findByDocumento(String numeroDocumento, String tipoDocumento) {
+        log.info("Buscando usuario: {}", numeroDocumento);
+        return repository.findByDocumento(numeroDocumento, tipoDocumento)
+                .map(entity -> mapper.map(entity, Usuario.class))
+                .doOnNext(u -> log.info("Usuario encontrado: {}", u))
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.info("Usuario no encontrado con documento={}", numeroDocumento);
+                    return Mono.empty();
+                }))
+                .doOnError(e -> log.error("Error al buscar usuario {} : {}", numeroDocumento, e.getMessage()));
+    }
 }

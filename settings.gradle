@@ -14,8 +14,6 @@ buildCache {
 
 rootProject.name = 'crediya-autenticacion'
 
-includeBuild("../crediya-common-api")
-
 include ':app-service'
 include ':model'
 include ':usecase'

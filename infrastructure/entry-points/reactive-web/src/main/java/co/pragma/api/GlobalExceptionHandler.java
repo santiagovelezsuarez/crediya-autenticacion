@@ -1,9 +1,10 @@
 package co.pragma.api;
 
-import co.pragma.base.exception.BusinessException;
-import co.pragma.base.exception.EmailAlreadyRegisteredException;
-import common.api.dto.ErrorResponse;
-import common.api.exception.DtoValidationException;
+import co.pragma.api.dto.DtoValidationException;
+import co.pragma.api.dto.ErrorResponse;
+import co.pragma.exception.BusinessException;
+import co.pragma.exception.DomainError;
+import co.pragma.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,41 +12,31 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import reactor.core.publisher.Mono;
-
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EmailAlreadyRegisteredException.class)
-    public Mono<ResponseEntity<ErrorResponse>> handleEmailAlreadyRegistered(EmailAlreadyRegisteredException ex, ServerHttpRequest request) {
-        log.info("EmailAlreadyRegisteredException: {}", ex.getMessage());
+    @ExceptionHandler(BusinessException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handle(BusinessException ex, ServerHttpRequest request) {
+        DomainError domainError = DomainError.from(ex);
+        HttpStatus status = toHttpStatus(ex.getCode());
+
+        log.warn("BusinessException: {} - {}", domainError.code(), ex.getMessage());
+
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(Instant.now())
-                .status(HttpStatus.CONFLICT.value())
-                .error("EMAIL_ALREADY_REGISTERED")
-                .message(ex.getMessage())
+                .status(status.value())
+                .error(domainError.code())
+                .message(domainError.message())
                 .path(request.getPath().value())
                 .build();
-        return Mono.just(ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(error));
-    }
 
-    @ExceptionHandler(BusinessException.class)
-    public Mono<ResponseEntity<ErrorResponse>> handleBusinessException(BusinessException ex, ServerHttpRequest request) {
-        log.warn("BusinessException: {}", ex.getMessage());
-        ErrorResponse error = ErrorResponse.builder()
-                .timestamp(java.time.Instant.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("BUSINESS_ERROR")
-                .message(ex.getMessage())
-                .path(request.getPath().value())
-                .build();
         return Mono.just(ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(status)
                 .body(error));
     }
 
@@ -66,8 +57,11 @@ public class GlobalExceptionHandler {
                 .validationErrors(fieldErrors)
                 .build();
 
-        return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
-
+        return Mono.just(
+                ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response)
+        );
     }
 
     @ExceptionHandler(Exception.class)
@@ -83,6 +77,16 @@ public class GlobalExceptionHandler {
         return Mono.just(ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(error));
+    }
+
+    private static final Map<ErrorCode, HttpStatus> MAPPINGS = Map.of(
+            ErrorCode.EMAIL_ALREADY_REGISTERED, HttpStatus.CONFLICT,
+            ErrorCode.SALARIO_OUT_OF_RANGE, HttpStatus.UNPROCESSABLE_ENTITY,
+            ErrorCode.USUARIO_NOT_FOUND, HttpStatus.NOT_FOUND
+    );
+
+    public static HttpStatus toHttpStatus(ErrorCode code) {
+        return MAPPINGS.getOrDefault(code, HttpStatus.BAD_REQUEST);
     }
 }
 

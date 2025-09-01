@@ -1,8 +1,9 @@
 package co.pragma.usecase.usuario;
 
-import co.pragma.base.gateways.BusinessValidator;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
+import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
+import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,13 +25,20 @@ class UsuarioUseCaseTest {
     private UsuarioRepository usuarioRepository;
 
     @Mock
-    private BusinessValidator<Usuario> registrationValidator;
+    private SalarioRangeValidator salarioRangeValidator;
+
+    @Mock
+    private UniqueEmailValidator uniqueEmailValidator;
 
     private UsuarioUseCase usuarioUseCase;
 
     @BeforeEach
     void setUp() {
-        usuarioUseCase = new UsuarioUseCase(usuarioRepository, registrationValidator);
+        usuarioUseCase = new UsuarioUseCase(
+                usuarioRepository,
+                salarioRangeValidator,
+                uniqueEmailValidator
+        );
     }
 
     @Test
@@ -46,7 +54,8 @@ class UsuarioUseCaseTest {
                 .salarioBase(BigDecimal.valueOf(3250000))
                 .build();
 
-        when(registrationValidator.validate(usuario)).thenReturn(Mono.just(usuario));
+        when(uniqueEmailValidator.validate(usuario)).thenReturn(Mono.just(usuario));
+        when(salarioRangeValidator.validate(usuario)).thenReturn(Mono.just(usuario));
         when(usuarioRepository.save(usuario)).thenReturn(Mono.just(usuario));
 
         StepVerifier.create(usuarioUseCase.registerUser(usuario))
@@ -54,5 +63,29 @@ class UsuarioUseCaseTest {
                 .verifyComplete();
 
         verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void shouldfindByDocumentoSuccessfully() {
+        String numeroDocumento = "123456789";
+        String tipoDocumento = "CC";
+
+        Usuario usuario = Usuario.builder()
+                .id("1")
+                .nombres("Jhon Doe")
+                .apellidos("Doe")
+                .fechaNacimiento(LocalDate.of(1990, 1, 1))
+                .direccion("123 Main St")
+                .telefono("1234567890")
+                .email("jhondoe@mail.co")
+                .salarioBase(BigDecimal.valueOf(3250000))
+                .build();
+
+        when(usuarioRepository.findByDocumento(numeroDocumento, tipoDocumento)).thenReturn(Mono.just(usuario));
+
+        StepVerifier.create(usuarioUseCase.findByDocumento(numeroDocumento, tipoDocumento))
+                .expectNextMatches(u -> u.getEmail().equals("jhondoe@mail.co"))
+                .verifyComplete();
+        verify(usuarioRepository).findByDocumento(numeroDocumento, tipoDocumento);
     }
 }

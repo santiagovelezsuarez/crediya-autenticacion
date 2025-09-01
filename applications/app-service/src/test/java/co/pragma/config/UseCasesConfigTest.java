@@ -3,7 +3,6 @@ package co.pragma.config;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.usecase.usuario.UsuarioUseCase;
 import org.junit.jupiter.api.Test;
-
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

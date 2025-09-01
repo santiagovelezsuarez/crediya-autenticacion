@@ -1,16 +1,17 @@
 package co.pragma.api;
 
+import co.pragma.api.dto.DtoValidatorBuilder;
 import co.pragma.api.dto.UsuarioDtoMapper;
 import co.pragma.api.dto.UsuarioRequest;
-import co.pragma.base.exception.BusinessException;
+import co.pragma.exception.UsuarioNotFoundException;
 import co.pragma.usecase.usuario.UsuarioUseCase;
-import common.api.dto.ErrorResponse;
-import common.api.dto.ValidationUtil;
+import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -31,7 +32,7 @@ public class Handler {
         return serverRequest
                 .bodyToMono(UsuarioRequest.class)
                 .doOnNext(req -> log.info("Request Body: {}", req))
-                .flatMap(dto -> ValidationUtil.validate(dto, validator))
+                .flatMap(dto -> DtoValidatorBuilder.validate(dto, validator))
                 .map(usuarioDtoMapper::toModel)
                 .flatMap(usuarioUseCase::registerUser)
                 .doOnSuccess(resp -> log.info("Usuario registrado exitosamente: {}", resp.getEmail()))
@@ -59,9 +60,7 @@ public class Handler {
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(userResponse))
                 .switchIfEmpty(
-                        Mono.error(new BusinessException(
-                                String.format("No se encontró usuario con documento %s %s", tipoDocumento, numeroDocumento)
-                        ))
+                        Mono.error(new UsuarioNotFoundException("Usuario no encontrado con documento: " + tipoDocumento + " " + numeroDocumento))
                 );
     }
 }

@@ -1,5 +1,8 @@
 package co.pragma.api.dto;
 
+import lombok.Builder;
+
+@Builder
 public record UsuarioResponse(
         String id,
         String nombres,

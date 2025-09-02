@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 public interface UsuarioDtoMapper {
 
     @Mapping(target = "id", ignore = true)
-    Usuario toModel(UsuarioRequest request);
+    Usuario toModel(RegistrarUsuarioDTO request);
 
     UsuarioResponse toResponse(Usuario usuario);
 }

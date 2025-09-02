@@ -6,7 +6,7 @@ import java.util.List;
 @Getter
 public class DtoValidationException extends RuntimeException {
 
-    private final List<FieldError> errors;
+    private final transient List<FieldError> errors;
 
     public DtoValidationException(List<FieldError> errors) {
         super("Error, verifique la informacion enviada");

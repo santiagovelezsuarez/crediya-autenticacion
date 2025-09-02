@@ -21,7 +21,7 @@ class DtoValidatorBuilderTest {
 
     @Test
     void shouldReturnDtoWhenValid() {
-        UsuarioRequest dto = UsuarioRequest.builder()
+        RegistrarUsuarioDTO dto = RegistrarUsuarioDTO.builder()
                 .nombres("John")
                 .apellidos("Doe")
                 .tipoDocumento("CC")
@@ -37,7 +37,7 @@ class DtoValidatorBuilderTest {
 
     @Test
     void shouldErrorWhenInvalidEmail() {
-        UsuarioRequest dto = UsuarioRequest.builder()
+        RegistrarUsuarioDTO dto = RegistrarUsuarioDTO.builder()
                 .nombres("John")
                 .apellidos("Doe")
                 .tipoDocumento("CC")
@@ -62,7 +62,7 @@ class DtoValidatorBuilderTest {
 
     @Test
     void shouldErrorWhenMultipleFieldsInvalid() {
-        UsuarioRequest dto = UsuarioRequest.builder()
+        RegistrarUsuarioDTO dto = RegistrarUsuarioDTO.builder()
                 .nombres("")
                 .apellidos("")
                 .tipoDocumento("XX")

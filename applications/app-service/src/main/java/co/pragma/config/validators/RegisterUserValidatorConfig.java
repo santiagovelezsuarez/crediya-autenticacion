@@ -2,6 +2,7 @@ package co.pragma.config.validators;
 
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
+import co.pragma.usecase.usuario.businessrules.UniqueDocumentoIdentidad;
 import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,11 @@ public class RegisterUserValidatorConfig {
     @Bean
     public UniqueEmailValidator uniqueEmailValidator(UsuarioRepository repository) {
         return new UniqueEmailValidator(repository);
+    }
+
+    @Bean
+    public UniqueDocumentoIdentidad uniqueDocumentoIdentidad(UsuarioRepository repository) {
+        return new UniqueDocumentoIdentidad(repository);
     }
 }
 

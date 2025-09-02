@@ -10,10 +10,6 @@ public interface UsuarioReactiveRepository extends ReactiveCrudRepository<Usuari
 
     Mono<UsuarioEntity> findByEmail(String email);
 
-    @Query("""
-        SELECT * FROM usuarios
-        WHERE numero_documento = $1
-        AND tipo_documento = $2
-        """)
-    Mono<UsuarioEntity> findByDocumento(String numeroDocumento, String tipoDocumento);
+
+    Mono<UsuarioEntity> findByTipoDocumentoAndNumeroDocumento(String tipoDocumento, String numeroDocumento);
 }

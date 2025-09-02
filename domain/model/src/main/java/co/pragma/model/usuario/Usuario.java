@@ -5,8 +5,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)

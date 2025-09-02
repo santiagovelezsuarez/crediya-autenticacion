@@ -120,14 +120,14 @@ class UsuarioRepositoryAdapterTest {
                 .salarioBase(BigDecimal.valueOf(3250000))
                 .build();
 
-        when(repository.findByDocumento(numeroDocumento, tipoDocumento)).thenReturn(Mono.just(entity));
+        when(repository.findByDocumento(tipoDocumento, numeroDocumento)).thenReturn(Mono.just(entity));
         when(mapper.map(entity, Usuario.class)).thenReturn(usuario);
 
-        StepVerifier.create(repositoryAdapter.findByDocumento(numeroDocumento, tipoDocumento))
+        StepVerifier.create(repositoryAdapter.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento))
                 .expectNext(usuario)
                 .verifyComplete();
 
-        verify(repository).findByDocumento(numeroDocumento, tipoDocumento);
+        verify(repository).findByDocumento(tipoDocumento, numeroDocumento);
     }
 
     @Test
@@ -174,12 +174,12 @@ class UsuarioRepositoryAdapterTest {
     }
 
     @Test
-    void shouldErrorWhenDatabaseErrorOnFindByDocumento() {
+    void shouldErrorWhenDatabaseErrorOnFindByTipoDocumentoAndNumeroDocumento() {
         String numeroDocumento = "123456789";
         String tipoDocumento = "CC";
 
         when(repository.findByDocumento(numeroDocumento, tipoDocumento)).thenReturn(Mono.error(new RuntimeException("Database error")));
-        StepVerifier.create(repositoryAdapter.findByDocumento(numeroDocumento, tipoDocumento))
+        StepVerifier.create(repositoryAdapter.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento))
                 .expectError(RuntimeException.class)
                 .verify();
         verify(repository).findByDocumento(numeroDocumento, tipoDocumento);
@@ -192,8 +192,8 @@ class UsuarioRepositoryAdapterTest {
 
         when(repository.findByDocumento(numeroDocumento, tipoDocumento)).thenReturn(Mono.empty());
 
-        StepVerifier.create(repositoryAdapter.findByDocumento(numeroDocumento, tipoDocumento))
-                .verifyComplete(); // Se completa sin emitir valores
+        StepVerifier.create(repositoryAdapter.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento))
+                .verifyComplete();
 
         verify(repository).findByDocumento(numeroDocumento, tipoDocumento);
     }

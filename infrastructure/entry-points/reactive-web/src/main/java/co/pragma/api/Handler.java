@@ -2,16 +2,15 @@ package co.pragma.api;
 
 import co.pragma.api.dto.DtoValidatorBuilder;
 import co.pragma.api.dto.UsuarioDtoMapper;
-import co.pragma.api.dto.UsuarioRequest;
+import co.pragma.api.dto.RegistrarUsuarioDTO;
 import co.pragma.exception.UsuarioNotFoundException;
 import co.pragma.usecase.usuario.UsuarioUseCase;
-import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -22,15 +21,13 @@ import reactor.core.publisher.Mono;
 public class Handler {
 
     private final UsuarioUseCase usuarioUseCase;
-
     private final UsuarioDtoMapper usuarioDtoMapper;
-
     private final Validator validator;
 
     public Mono<ServerResponse> listenRegisterUser(ServerRequest serverRequest) {
         log.info("Petición recibida para registrar usuario");
         return serverRequest
-                .bodyToMono(UsuarioRequest.class)
+                .bodyToMono(RegistrarUsuarioDTO.class)
                 .doOnNext(req -> log.info("Request Body: {}", req))
                 .flatMap(dto -> DtoValidatorBuilder.validate(dto, validator))
                 .map(usuarioDtoMapper::toModel)
@@ -39,7 +36,7 @@ public class Handler {
                 .doOnError(err -> log.error("Error al registrar usuario: {}", err.getMessage()))
                 .map(usuarioDtoMapper::toResponse)
                 .flatMap(savedUser -> ServerResponse
-                        .status(201)
+                        .status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(savedUser));
     }

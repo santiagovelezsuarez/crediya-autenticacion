@@ -81,11 +81,11 @@ class UsuarioUseCaseTest {
                 .salarioBase(BigDecimal.valueOf(3250000))
                 .build();
 
-        when(usuarioRepository.findByDocumento(numeroDocumento, tipoDocumento)).thenReturn(Mono.just(usuario));
+        when(usuarioRepository.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento)).thenReturn(Mono.just(usuario));
 
         StepVerifier.create(usuarioUseCase.findByDocumento(numeroDocumento, tipoDocumento))
                 .expectNextMatches(u -> u.getEmail().equals("jhondoe@mail.co"))
                 .verifyComplete();
-        verify(usuarioRepository).findByDocumento(numeroDocumento, tipoDocumento);
+        verify(usuarioRepository).findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento);
     }
 }

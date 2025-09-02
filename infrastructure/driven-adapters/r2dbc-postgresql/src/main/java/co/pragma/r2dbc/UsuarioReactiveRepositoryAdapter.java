@@ -46,9 +46,9 @@ public class UsuarioReactiveRepositoryAdapter extends ReactiveAdapterOperations<
 
 
     @Override
-    public Mono<Usuario> findByDocumento(String numeroDocumento, String tipoDocumento) {
+    public Mono<Usuario> findByTipoDocumentoAndNumeroDocumento(String tipoDocumento ,String numeroDocumento) {
         log.info("Buscando usuario: {}", numeroDocumento);
-        return repository.findByDocumento(numeroDocumento, tipoDocumento)
+        return repository.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento)
                 .map(entity -> mapper.map(entity, Usuario.class))
                 .doOnNext(u -> log.info("Usuario encontrado: {}", u))
                 .switchIfEmpty(Mono.defer(() -> {

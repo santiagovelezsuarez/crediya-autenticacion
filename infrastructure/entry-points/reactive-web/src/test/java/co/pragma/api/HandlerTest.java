@@ -1,7 +1,7 @@
 package co.pragma.api;
 
+import co.pragma.api.dto.RegistrarUsuarioDTO;
 import co.pragma.api.dto.UsuarioDtoMapper;
-import co.pragma.api.dto.UsuarioRequest;
 import co.pragma.api.dto.UsuarioResponse;
 import co.pragma.exception.UsuarioNotFoundException;
 import co.pragma.model.usuario.Usuario;
@@ -36,7 +36,7 @@ class HandlerTest {
 
     @Test
     void listenRegisterUser_shouldReturn201WhenUserIsCreated() {
-        UsuarioRequest request = new UsuarioRequest();
+        RegistrarUsuarioDTO request = new RegistrarUsuarioDTO();
         request.setEmail("test@example.com");
 
         Usuario usuarioModel = new Usuario();
@@ -68,7 +68,7 @@ class HandlerTest {
 
     @Test
     void listenRegisterUser_shouldLogErrorWhenUseCaseFails() {
-        UsuarioRequest request = new UsuarioRequest();
+        RegistrarUsuarioDTO request = new RegistrarUsuarioDTO();
         request.setEmail("fail@example.com");
 
         Usuario usuarioModel = new Usuario();

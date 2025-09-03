@@ -1,6 +1,7 @@
 package co.pragma.api;
 
-import co.pragma.api.dto.UsuarioRequest;
+import co.pragma.api.dto.ErrorResponse;
+import co.pragma.api.dto.RegistrarUsuarioDTO;
 import co.pragma.api.dto.UsuarioResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,22 +32,25 @@ public class RouterRest {
                     beanClass = Handler.class,
                     beanMethod = "listenRegisterUser",
                     operation = @Operation(
-                            operationId = "saveUser",
+                            operationId = "RegistrarUsuario",
                             summary = "Registrar un nuevo usuario",
-                            description = "Crea un usuario en el sistema",
-                            tags = {"Usuario"},
+                            description = "Crea un nuevo usuario en el sistema",
+                            tags = {"Registrar Usuario"},
                             requestBody = @RequestBody(
                                     required = true,
-                                    content = @Content(schema = @Schema(implementation = UsuarioRequest.class))
+                                    content = @Content(schema = @Schema(implementation = RegistrarUsuarioDTO.class))
                             ),
                             responses = {
-                                    @ApiResponse(
-                                            responseCode = "201",
-                                            description = "Usuario registrado correctamente",
-                                            content = @Content(schema = @Schema(implementation = UsuarioResponse.class))
-                                    ),
-                                    @ApiResponse(responseCode = "400", description = "Request inválido"),
-                                    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+                                    @ApiResponse(responseCode = "201", description = "Usuario registrado correctamente",
+                                            content = @Content(schema = @Schema(implementation = UsuarioResponse.class))),
+                                    @ApiResponse(responseCode = "409", description = "Email o documento ya registrado",
+                                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                                    @ApiResponse(responseCode = "422", description = "Salario fuera de rango",
+                                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                                    @ApiResponse(responseCode = "400", description = "Request inválido",
+                                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                                    @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                                            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
                             }
                     )
             ),
@@ -57,18 +61,17 @@ public class RouterRest {
                     beanClass = Handler.class,
                     beanMethod = "listenFindByDocumento",
                     operation = @Operation(
-                            operationId = "FindUsuarioByDocumento",
+                            operationId = "ObtenerUsuarioPorDocumento",
                             summary = "Obtener usuario por tipo y número de documento",
                             description = "Busca un usuario en el sistema usando su tipo y número de documento",
-                            tags = {"Usuario"},
+                            tags = {"Obtener Usuario"},
                             responses = {
-                                    @ApiResponse(
-                                            responseCode = "200",
-                                            description = "Usuario encontrado",
-                                            content = @Content(schema = @Schema(implementation = UsuarioResponse.class))
-                                    ),
-                                    @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
-                                    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+                                    @ApiResponse(responseCode = "200", description = "Usuario encontrado",
+                                            content = @Content(schema = @Schema(implementation = UsuarioResponse.class))),
+                                    @ApiResponse(responseCode = "404", description = "Usuario no encontrado",
+                                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                                    @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                                            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
                             }
                     )
             )
@@ -88,7 +91,7 @@ public class RouterRest {
                     operation = @Operation(
                             operationId = "healthCheck",
                             summary = "Health check",
-                            description = "Verifica que el servicio está arriba",
+                            description = "Verifica que el servicio está disponible",
                             tags = {"Health"},
                             responses = {
                                     @ApiResponse(responseCode = "200", description = "Servicio disponible")

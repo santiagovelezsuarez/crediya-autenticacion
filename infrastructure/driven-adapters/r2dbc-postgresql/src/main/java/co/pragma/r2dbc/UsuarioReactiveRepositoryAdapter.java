@@ -2,6 +2,7 @@ package co.pragma.r2dbc;
 
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
+import co.pragma.r2dbc.entity.TipoDocumentoEnum;
 import co.pragma.r2dbc.entity.UsuarioEntity;
 import co.pragma.r2dbc.helper.ReactiveAdapterOperations;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +47,9 @@ public class UsuarioReactiveRepositoryAdapter extends ReactiveAdapterOperations<
 
 
     @Override
-    public Mono<Usuario> findByDocumento(String numeroDocumento, String tipoDocumento) {
+    public Mono<Usuario> findByTipoDocumentoAndNumeroDocumento(String tipoDocumento , String numeroDocumento) {
         log.info("Buscando usuario: {}", numeroDocumento);
-        return repository.findByDocumento(numeroDocumento, tipoDocumento)
+        return repository.findByTipoDocumentoAndNumeroDocumento(TipoDocumentoEnum.valueOf(tipoDocumento), numeroDocumento)
                 .map(entity -> mapper.map(entity, Usuario.class))
                 .doOnNext(u -> log.info("Usuario encontrado: {}", u))
                 .switchIfEmpty(Mono.defer(() -> {

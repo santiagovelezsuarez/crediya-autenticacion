@@ -1,8 +1,10 @@
 package co.pragma.usecase.usuario;
 
-import co.pragma.base.gateways.BusinessValidator;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
+import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
+import co.pragma.usecase.usuario.businessrules.UniqueDocumentoIdentidad;
+import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +15,7 @@ import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,19 +27,30 @@ class UsuarioUseCaseTest {
     private UsuarioRepository usuarioRepository;
 
     @Mock
-    private BusinessValidator<Usuario> registrationValidator;
+    private SalarioRangeValidator salarioRangeValidator;
+
+    @Mock
+    private UniqueEmailValidator uniqueEmailValidator;
+
+    @Mock
+    private UniqueDocumentoIdentidad uniqueDocumentoIdentidad;
 
     private UsuarioUseCase usuarioUseCase;
 
     @BeforeEach
     void setUp() {
-        usuarioUseCase = new UsuarioUseCase(usuarioRepository, registrationValidator);
+        usuarioUseCase = new UsuarioUseCase(
+                usuarioRepository,
+                salarioRangeValidator,
+                uniqueEmailValidator,
+                uniqueDocumentoIdentidad
+        );
     }
 
     @Test
     void shouldRegisterUserSuccessfully() {
         Usuario usuario = Usuario.builder()
-                .id("1")
+                .id(UUID.fromString("33ac0a47-79bd-4d78-8d08-c9c707cfa529"))
                 .nombres("Jhon Doe")
                 .apellidos("Doe")
                 .fechaNacimiento(LocalDate.of(1990, 1, 1))
@@ -46,13 +60,39 @@ class UsuarioUseCaseTest {
                 .salarioBase(BigDecimal.valueOf(3250000))
                 .build();
 
-        when(registrationValidator.validate(usuario)).thenReturn(Mono.just(usuario));
+        when(uniqueEmailValidator.validate(usuario)).thenReturn(Mono.just(usuario));
+        when(salarioRangeValidator.validate(usuario)).thenReturn(Mono.just(usuario));
         when(usuarioRepository.save(usuario)).thenReturn(Mono.just(usuario));
+        when(uniqueDocumentoIdentidad.validate(usuario)).thenReturn(Mono.just(usuario));
 
         StepVerifier.create(usuarioUseCase.registerUser(usuario))
                 .expectNextMatches(u -> u.getEmail().equals("jhondoe@example.co"))
                 .verifyComplete();
 
         verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void shouldfindByDocumentoSuccessfully() {
+        String numeroDocumento = "123456789";
+        String tipoDocumento = "CC";
+
+        Usuario usuario = Usuario.builder()
+                .id(UUID.fromString("33ac0a47-79bd-4d78-8d08-c9c707cfa529"))
+                .nombres("Jhon Doe")
+                .apellidos("Doe")
+                .fechaNacimiento(LocalDate.of(1990, 1, 1))
+                .direccion("123 Main St")
+                .telefono("1234567890")
+                .email("jhondoe@mail.co")
+                .salarioBase(BigDecimal.valueOf(3250000))
+                .build();
+
+        when(usuarioRepository.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento)).thenReturn(Mono.just(usuario));
+
+        StepVerifier.create(usuarioUseCase.findByDocumento(numeroDocumento, tipoDocumento))
+                .expectNextMatches(u -> u.getEmail().equals("jhondoe@mail.co"))
+                .verifyComplete();
+        verify(usuarioRepository).findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento);
     }
 }

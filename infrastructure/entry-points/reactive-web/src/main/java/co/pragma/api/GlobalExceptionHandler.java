@@ -1,51 +1,46 @@
 package co.pragma.api;
 
-import co.pragma.base.exception.BusinessException;
-import co.pragma.base.exception.EmailAlreadyRegisteredException;
-import common.api.dto.ErrorResponse;
-import common.api.exception.DtoValidationException;
+import co.pragma.api.dto.DtoValidationException;
+import co.pragma.api.dto.ErrorResponse;
+import co.pragma.exception.BusinessException;
+import co.pragma.exception.DomainError;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
-
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EmailAlreadyRegisteredException.class)
-    public Mono<ResponseEntity<ErrorResponse>> handleEmailAlreadyRegistered(EmailAlreadyRegisteredException ex, ServerHttpRequest request) {
-        log.info("EmailAlreadyRegisteredException: {}", ex.getMessage());
-        ErrorResponse error = ErrorResponse.builder()
-                .timestamp(Instant.now())
-                .status(HttpStatus.CONFLICT.value())
-                .error("EMAIL_ALREADY_REGISTERED")
-                .message(ex.getMessage())
-                .path(request.getPath().value())
-                .build();
-        return Mono.just(ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(error));
-    }
+    private final ErrorCodeHttpMapper errorCodeHttpMapper;
 
     @ExceptionHandler(BusinessException.class)
-    public Mono<ResponseEntity<ErrorResponse>> handleBusinessException(BusinessException ex, ServerHttpRequest request) {
-        log.warn("BusinessException: {}", ex.getMessage());
+    public Mono<ResponseEntity<ErrorResponse>> handle(BusinessException ex, ServerHttpRequest request) {
+        DomainError domainError = DomainError.from(ex);
+        HttpStatus status = errorCodeHttpMapper.toHttpStatus(ex.getCode());
+
+        log.warn("BusinessException: {} - {}", domainError.code(), ex.getMessage());
+
         ErrorResponse error = ErrorResponse.builder()
-                .timestamp(java.time.Instant.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("BUSINESS_ERROR")
-                .message(ex.getMessage())
+                .timestamp(Instant.now())
+                .status(status.value())
+                .error(domainError.code())
+                .message(domainError.message())
                 .path(request.getPath().value())
                 .build();
+
         return Mono.just(ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(status)
                 .body(error));
     }
 
@@ -66,8 +61,28 @@ public class GlobalExceptionHandler {
                 .validationErrors(fieldErrors)
                 .build();
 
-        return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
+        return Mono.just(
+                ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response)
+        );
+    }
 
+    @ExceptionHandler(org.springframework.web.server.ServerWebInputException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleWebInputException(ServerWebInputException ex, ServerHttpRequest request) {
+        log.warn("ServerWebInputException: {}", ex.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("INVALID_REQUEST_BODY")
+                .message("El cuerpo de la solicitud está vacío o es inválido.")
+                .path(request.getPath().value())
+                .build();
+
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(error));
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,14 +1,14 @@
 package co.pragma.api;
 
+import co.pragma.api.dto.DtoValidatorBuilder;
 import co.pragma.api.dto.UsuarioDtoMapper;
-import co.pragma.api.dto.UsuarioRequest;
-import co.pragma.base.exception.BusinessException;
+import co.pragma.api.dto.RegistrarUsuarioDTO;
+import co.pragma.exception.UsuarioNotFoundException;
 import co.pragma.usecase.usuario.UsuarioUseCase;
-import common.api.dto.ErrorResponse;
-import common.api.dto.ValidationUtil;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -21,24 +21,22 @@ import reactor.core.publisher.Mono;
 public class Handler {
 
     private final UsuarioUseCase usuarioUseCase;
-
     private final UsuarioDtoMapper usuarioDtoMapper;
-
     private final Validator validator;
 
     public Mono<ServerResponse> listenRegisterUser(ServerRequest serverRequest) {
         log.info("Petición recibida para registrar usuario");
         return serverRequest
-                .bodyToMono(UsuarioRequest.class)
+                .bodyToMono(RegistrarUsuarioDTO.class)
                 .doOnNext(req -> log.info("Request Body: {}", req))
-                .flatMap(dto -> ValidationUtil.validate(dto, validator))
+                .flatMap(dto -> DtoValidatorBuilder.validate(dto, validator))
                 .map(usuarioDtoMapper::toModel)
                 .flatMap(usuarioUseCase::registerUser)
                 .doOnSuccess(resp -> log.info("Usuario registrado exitosamente: {}", resp.getEmail()))
                 .doOnError(err -> log.error("Error al registrar usuario: {}", err.getMessage()))
                 .map(usuarioDtoMapper::toResponse)
                 .flatMap(savedUser -> ServerResponse
-                        .status(201)
+                        .status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(savedUser));
     }
@@ -59,9 +57,7 @@ public class Handler {
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(userResponse))
                 .switchIfEmpty(
-                        Mono.error(new BusinessException(
-                                String.format("No se encontró usuario con documento %s %s", tipoDocumento, numeroDocumento)
-                        ))
+                        Mono.error(new UsuarioNotFoundException("Usuario no encontrado con documento: " + tipoDocumento + " " + numeroDocumento))
                 );
     }
 }

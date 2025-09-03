@@ -1,12 +1,9 @@
 package co.pragma.api.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import jakarta.validation.constraints.NotBlank;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
@@ -14,7 +11,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsuarioRequest {
+public class RegistrarUsuarioDTO {
 
     @NotBlank(message = "El campo nombres no puede estar vacío")
     private String nombres;
@@ -27,6 +24,7 @@ public class UsuarioRequest {
     private String tipoDocumento;
 
     @NotBlank(message = "El campo numeroDocumento no puede estar vacío")
+    @Pattern(regexp = "^\\d{5,15}$", message = "El número de documento no es válido")
     private String numeroDocumento;
 
     private String fechaNacimiento;
@@ -39,6 +37,7 @@ public class UsuarioRequest {
     @Email(message = "El campo email debe ser una dirección de correo electrónico válida")
     private String email;
 
+    @NotNull(message = "El salario base es obligatorio")
     @Positive(message = "El salario debe ser positivo")
     private BigDecimal salarioBase;
 }

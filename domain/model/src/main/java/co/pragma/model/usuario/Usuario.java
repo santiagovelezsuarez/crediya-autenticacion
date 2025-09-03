@@ -3,13 +3,14 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class Usuario {
-    private String id;
+    private UUID id;
     private String nombres;
     private String apellidos;
     private String tipoDocumento;

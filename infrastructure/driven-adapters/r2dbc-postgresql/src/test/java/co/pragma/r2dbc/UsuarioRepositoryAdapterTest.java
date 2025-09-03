@@ -2,6 +2,7 @@ package co.pragma.r2dbc;
 
 import co.pragma.exception.EmailAlreadyRegisteredException;
 import co.pragma.model.usuario.Usuario;
+import co.pragma.r2dbc.entity.TipoDocumentoEnum;
 import co.pragma.r2dbc.entity.UsuarioEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -98,7 +99,7 @@ class UsuarioRepositoryAdapterTest {
     @Test
     void shouldFindUserByDocumento() {
         String numeroDocumento = "123456789";
-        String tipoDocumento = "CC";
+        TipoDocumentoEnum tipoDocumento = TipoDocumentoEnum.CC;
 
         Usuario usuario = Usuario.builder()
                 .nombres("Jhon Doe")
@@ -120,14 +121,14 @@ class UsuarioRepositoryAdapterTest {
                 .salarioBase(BigDecimal.valueOf(3250000))
                 .build();
 
-        when(repository.findByDocumento(tipoDocumento, numeroDocumento)).thenReturn(Mono.just(entity));
+        when(repository.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento)).thenReturn(Mono.just(entity));
         when(mapper.map(entity, Usuario.class)).thenReturn(usuario);
 
-        StepVerifier.create(repositoryAdapter.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento))
+        StepVerifier.create(repositoryAdapter.findByTipoDocumentoAndNumeroDocumento(String.valueOf(tipoDocumento), numeroDocumento))
                 .expectNext(usuario)
                 .verifyComplete();
 
-        verify(repository).findByDocumento(tipoDocumento, numeroDocumento);
+        verify(repository).findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento);
     }
 
     @Test
@@ -175,14 +176,14 @@ class UsuarioRepositoryAdapterTest {
 
     @Test
     void shouldErrorWhenDatabaseErrorOnFindByTipoDocumentoAndNumeroDocumento() {
-        String numeroDocumento = "123456789";
         String tipoDocumento = "CC";
+        String numeroDocumento = "123456789";
 
-        when(repository.findByDocumento(numeroDocumento, tipoDocumento)).thenReturn(Mono.error(new RuntimeException("Database error")));
+        when(repository.findByTipoDocumentoAndNumeroDocumento(TipoDocumentoEnum.valueOf(tipoDocumento), numeroDocumento)).thenReturn(Mono.error(new RuntimeException("Database error")));
         StepVerifier.create(repositoryAdapter.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento))
                 .expectError(RuntimeException.class)
                 .verify();
-        verify(repository).findByDocumento(numeroDocumento, tipoDocumento);
+        verify(repository).findByTipoDocumentoAndNumeroDocumento(TipoDocumentoEnum.valueOf(tipoDocumento), numeroDocumento);
     }
 
     @Test
@@ -190,12 +191,11 @@ class UsuarioRepositoryAdapterTest {
         String numeroDocumento = "123456789";
         String tipoDocumento = "CC";
 
-        when(repository.findByDocumento(numeroDocumento, tipoDocumento)).thenReturn(Mono.empty());
+        when(repository.findByTipoDocumentoAndNumeroDocumento(TipoDocumentoEnum.valueOf(tipoDocumento), numeroDocumento)).thenReturn(Mono.empty());
 
         StepVerifier.create(repositoryAdapter.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento))
                 .verifyComplete();
 
-        verify(repository).findByDocumento(numeroDocumento, tipoDocumento);
+        verify(repository).findByTipoDocumentoAndNumeroDocumento(TipoDocumentoEnum.valueOf(tipoDocumento), numeroDocumento);
     }
-
 }

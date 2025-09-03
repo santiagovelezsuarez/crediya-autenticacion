@@ -3,6 +3,7 @@ package co.pragma.usecase.usuario;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
+import co.pragma.usecase.usuario.businessrules.UniqueDocumentoIdentidad;
 import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,6 +32,9 @@ class UsuarioUseCaseTest {
     @Mock
     private UniqueEmailValidator uniqueEmailValidator;
 
+    @Mock
+    private UniqueDocumentoIdentidad uniqueDocumentoIdentidad;
+
     private UsuarioUseCase usuarioUseCase;
 
     @BeforeEach
@@ -37,14 +42,15 @@ class UsuarioUseCaseTest {
         usuarioUseCase = new UsuarioUseCase(
                 usuarioRepository,
                 salarioRangeValidator,
-                uniqueEmailValidator
+                uniqueEmailValidator,
+                uniqueDocumentoIdentidad
         );
     }
 
     @Test
     void shouldRegisterUserSuccessfully() {
         Usuario usuario = Usuario.builder()
-                .id("1")
+                .id(UUID.fromString("33ac0a47-79bd-4d78-8d08-c9c707cfa529"))
                 .nombres("Jhon Doe")
                 .apellidos("Doe")
                 .fechaNacimiento(LocalDate.of(1990, 1, 1))
@@ -57,6 +63,7 @@ class UsuarioUseCaseTest {
         when(uniqueEmailValidator.validate(usuario)).thenReturn(Mono.just(usuario));
         when(salarioRangeValidator.validate(usuario)).thenReturn(Mono.just(usuario));
         when(usuarioRepository.save(usuario)).thenReturn(Mono.just(usuario));
+        when(uniqueDocumentoIdentidad.validate(usuario)).thenReturn(Mono.just(usuario));
 
         StepVerifier.create(usuarioUseCase.registerUser(usuario))
                 .expectNextMatches(u -> u.getEmail().equals("jhondoe@example.co"))
@@ -71,7 +78,7 @@ class UsuarioUseCaseTest {
         String tipoDocumento = "CC";
 
         Usuario usuario = Usuario.builder()
-                .id("1")
+                .id(UUID.fromString("33ac0a47-79bd-4d78-8d08-c9c707cfa529"))
                 .nombres("Jhon Doe")
                 .apellidos("Doe")
                 .fechaNacimiento(LocalDate.of(1990, 1, 1))

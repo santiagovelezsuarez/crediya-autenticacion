@@ -35,7 +35,7 @@ class HandlerTest {
     }
 
     @Test
-    void listenRegisterUser_shouldReturn201WhenUserIsCreated() {
+    void shouldReturn201WhenUserIsCreated() {
         RegistrarUsuarioDTO request = new RegistrarUsuarioDTO();
         request.setEmail("test@example.com");
 
@@ -67,7 +67,7 @@ class HandlerTest {
     }
 
     @Test
-    void listenRegisterUser_shouldLogErrorWhenUseCaseFails() {
+    void shouldLogErrorWhenRegisterUserUseCaseFails() {
         RegistrarUsuarioDTO request = new RegistrarUsuarioDTO();
         request.setEmail("fail@example.com");
 
@@ -88,9 +88,8 @@ class HandlerTest {
                 .verify();
     }
 
-
     @Test
-    void listenFindByDocumento_shouldReturn200WhenUserExists() {
+    void shouldReturn200WhenUserExists() {
         Usuario usuario = new Usuario();
         usuario.setEmail("found@example.com");
 
@@ -116,7 +115,7 @@ class HandlerTest {
     }
 
     @Test
-    void listenFindByDocumento_shouldErrorWhenUserNotFound() {
+    void shouldErrorWhenUserNotFound() {
         when(usuarioUseCase.findByDocumento("123", "CC")).thenReturn(Mono.empty());
 
         ServerRequest serverRequest = MockServerRequest.builder()
@@ -132,7 +131,7 @@ class HandlerTest {
     }
 
     @Test
-    void listenFindByDocumento_shouldLogErrorWhenUseCaseFails() {
+    void shouldLogErrorWhenFindByDocumentoUseCaseFails() {
         when(usuarioUseCase.findByDocumento("123", "CC"))
                 .thenReturn(Mono.error(new RuntimeException("Error al conectar con la base de datos")));
 

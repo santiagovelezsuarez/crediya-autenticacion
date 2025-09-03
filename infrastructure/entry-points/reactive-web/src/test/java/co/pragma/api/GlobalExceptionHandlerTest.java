@@ -13,19 +13,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import reactor.test.StepVerifier;
-
 import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
 
-    private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
+    private final ErrorCodeHttpMapper errorCodeHttpMapper = new ErrorCodeHttpMapper();
+    private final GlobalExceptionHandler handler = new GlobalExceptionHandler(errorCodeHttpMapper);
 
     @Test
-    void handleEmailAlreadyRegistered_shouldReturnConflict() {
+    void shouldHandleEmailAlreadyRegistered() {
         var ex = new EmailAlreadyRegisteredException("El email ya está registrado");
         ServerHttpRequest request = MockServerHttpRequest.get("/usuarios").build();
 
@@ -44,7 +42,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleSalarioOutOfRange_shouldReturnUnprocessableEntity() {
+    void shouldHandleSalarioOutOfRange() {
         var ex = new SalarioBaseException("El salario está fuera de rango");
         ServerHttpRequest request = MockServerHttpRequest.post("/usuarios").build();
 
@@ -62,7 +60,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleUsuarioNotFound_shouldReturnNotFound() {
+    void shouldHandleUsuarioNotFound() {
         var ex = new UsuarioNotFoundException("Usuario no encontrado");
         ServerHttpRequest request = MockServerHttpRequest.get("/usuarios/123").build();
 
@@ -80,7 +78,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleValidationException_shouldReturnBadRequestWithErrors() {
+    void shouldHandleValidationException() {
         var fieldErrors = List.of(
                 new DtoValidationException.FieldError("email", "Email inválido")
         );
@@ -103,7 +101,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleGeneralException_shouldReturnInternalServerError() {
+    void shouldHandleGeneralException() {
         Exception ex = new RuntimeException("Error inesperado");
 
         var result = handler.handleGeneralException(ex);

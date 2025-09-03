@@ -10,11 +10,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UniqueEmailValidatorTest {
+class UniqueEmailValidatorTest {
 
     @Mock
     private UsuarioRepository usuarioRepository;
@@ -31,7 +30,7 @@ public class UniqueEmailValidatorTest {
                 .thenReturn(Mono.just(usuario));
 
         StepVerifier.create(validator.validate(usuario))
-                .expectErrorMatches(ex -> ex instanceof BusinessException)
+                .expectErrorMatches(BusinessException.class::isInstance)
                 .verify();
     }
 

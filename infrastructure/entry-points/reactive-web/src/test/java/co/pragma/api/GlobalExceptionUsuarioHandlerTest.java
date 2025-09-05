@@ -17,7 +17,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class GlobalExceptionHandlerTest {
+class GlobalExceptionUsuarioHandlerTest {
 
     private final ErrorCodeHttpMapper errorCodeHttpMapper = new ErrorCodeHttpMapper();
     private final GlobalExceptionHandler handler = new GlobalExceptionHandler(errorCodeHttpMapper);

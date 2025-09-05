@@ -13,6 +13,7 @@ public record UsuarioResponse(
         String direccion,
         String telefono,
         String email,
-        String salarioBase
+        String salarioBase,
+        String rol
 ) {
 }

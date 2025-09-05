@@ -1,8 +1,8 @@
 package co.pragma.api;
 
-import co.pragma.api.dto.ErrorResponse;
-import co.pragma.api.dto.RegistrarUsuarioDTO;
-import co.pragma.api.dto.UsuarioResponse;
+import co.pragma.api.dto.*;
+import co.pragma.api.handler.AuthHandler;
+import co.pragma.api.handler.UsuarioHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,10 +26,10 @@ public class RouterRest {
     @Bean
     @RouterOperations({
             @RouterOperation(
-                    path = "/api/v1/usuario",
+                    path = "/api/v1/usuarios",
                     produces = {MediaType.APPLICATION_JSON_VALUE},
                     method = RequestMethod.POST,
-                    beanClass = Handler.class,
+                    beanClass = UsuarioHandler.class,
                     beanMethod = "listenRegisterUser",
                     operation = @Operation(
                             operationId = "RegistrarUsuario",
@@ -55,10 +55,10 @@ public class RouterRest {
                     )
             ),
             @RouterOperation(
-                    path = "/api/v1/usuario/{tipoDocumento}/{numeroDocumento}",
+                    path = "/api/v1/usuarios/{tipoDocumento}/{numeroDocumento}",
                     produces = {MediaType.APPLICATION_JSON_VALUE},
                     method = RequestMethod.GET,
-                    beanClass = Handler.class,
+                    beanClass = UsuarioHandler.class,
                     beanMethod = "listenFindByDocumento",
                     operation = @Operation(
                             operationId = "ObtenerUsuarioPorDocumento",
@@ -76,10 +76,41 @@ public class RouterRest {
                     )
             )
     })
-    public RouterFunction<ServerResponse> userRoutes(Handler handler) {
-        return route(POST("/api/v1/usuario"), handler::listenRegisterUser)
-                .and(route(GET("/api/v1/usuario/{tipoDocumento}/{numeroDocumento}"),
-                handler::listenFindByDocumento));
+    public RouterFunction<ServerResponse> userRoutes(UsuarioHandler handler) {
+        return route(POST("/api/v1/usuarios"), handler::listenRegisterUser)
+                .andRoute(GET("/api/v1/usuarios/{tipoDocumento}/{numeroDocumento}"),handler::listenFindByDocumento);
+    }
+
+    @Bean
+    @RouterOperations({
+            @RouterOperation(
+                    path = "/api/v1/login",
+                    produces = {MediaType.APPLICATION_JSON_VALUE},
+                    method = RequestMethod.POST,
+                    beanClass = UsuarioHandler.class,
+                    beanMethod = "listenAuthenticate",
+                    operation = @Operation(
+                            operationId = "AutenticarUsuario",
+                            summary = "Autenticar usuario y generar token JWT",
+                            description = "Valida las credenciales del usuario y genera un token JWT para sesiones autenticadas",
+                            tags = {"Autenticación"},
+                            requestBody = @RequestBody(
+                                    required = true,
+                                    content = @Content(schema = @Schema(implementation = AutenticarUsuarioDTO.class))
+                            ),
+                            responses = {
+                                    @ApiResponse(responseCode = "200", description = "Autenticación exitosa, token generado",
+                                            content = @Content(schema = @Schema(implementation = LoginResponseDTO.class))),
+                                    @ApiResponse(responseCode = "401", description = "Credenciales inválidas",
+                                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                                    @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                                            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                            }
+                    )
+            )
+    })
+    public RouterFunction<ServerResponse> authRoutes(AuthHandler handler) {
+        return route(POST("/api/v1/login"), handler::listenAuthenticate);
     }
 
     @Bean

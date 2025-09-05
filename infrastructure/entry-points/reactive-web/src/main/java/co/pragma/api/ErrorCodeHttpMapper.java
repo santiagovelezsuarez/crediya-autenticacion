@@ -13,7 +13,11 @@ public class ErrorCodeHttpMapper {
             ErrorCode.EMAIL_ALREADY_REGISTERED, HttpStatus.CONFLICT,
             ErrorCode.SALARIO_OUT_OF_RANGE, HttpStatus.UNPROCESSABLE_ENTITY,
             ErrorCode.USUARIO_NOT_FOUND, HttpStatus.NOT_FOUND,
-            ErrorCode.DOCUMENTO_ALREADY_REGISTERED, HttpStatus.CONFLICT
+            ErrorCode.ROL_NOT_FOUND, HttpStatus.NOT_FOUND,
+            ErrorCode.DOCUMENTO_ALREADY_REGISTERED, HttpStatus.CONFLICT,
+            ErrorCode.CREDENCIALES_INVALIDAS, HttpStatus.UNAUTHORIZED,
+            ErrorCode.FORBIDDEN, HttpStatus.FORBIDDEN
+
     );
 
     public HttpStatus toHttpStatus(ErrorCode code) {

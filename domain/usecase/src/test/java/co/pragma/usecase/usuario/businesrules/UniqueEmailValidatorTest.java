@@ -1,6 +1,6 @@
-package co.pragma.usecase.usuario.validators;
+package co.pragma.usecase.usuario.businesrules;
 
-import co.pragma.exception.BusinessException;
+import co.pragma.exception.EmailAlreadyRegisteredException;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
@@ -29,24 +29,22 @@ class UniqueEmailValidatorTest {
         when(usuarioRepository.findByEmail(usuario.getEmail()))
                 .thenReturn(Mono.just(usuario));
 
-        StepVerifier.create(validator.validate(usuario))
-                .expectErrorMatches(BusinessException.class::isInstance)
+        StepVerifier.create(validator.validate(usuario.getEmail()))
+                .expectError(EmailAlreadyRegisteredException.class)
                 .verify();
     }
 
     @Test
     void shouldPassWhenEmailDoesNotExist() {
-        Usuario usuario = Usuario.builder()
-                .email("newuser@example.co")
-                .build();
+        String email = "new_user@mail.co";
 
         UniqueEmailValidator validator = new UniqueEmailValidator(usuarioRepository);
 
-        when(usuarioRepository.findByEmail(usuario.getEmail()))
+        when(usuarioRepository.findByEmail(email))
                 .thenReturn(Mono.empty());
 
-        StepVerifier.create(validator.validate(usuario))
-                .expectNext(usuario)
+        StepVerifier.create(validator.validate(email))
+                .expectNext()
                 .verifyComplete();
     }
 }

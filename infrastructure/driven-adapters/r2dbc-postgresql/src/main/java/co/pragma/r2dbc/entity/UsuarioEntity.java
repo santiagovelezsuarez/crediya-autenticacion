@@ -6,7 +6,6 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -23,12 +22,13 @@ public class UsuarioEntity {
     private UUID id;
     private String nombres;
     private String apellidos;
-    @Column("tipo_documento")
-    private TipoDocumentoEnum tipoDocumento;
+    private String tipoDocumento;
     private String numeroDocumento;
     private LocalDate fechaNacimiento;
     private String direccion;
     private String telefono;
     private String email;
+    private String passwordHash;
     private BigDecimal salarioBase;
+    private Integer idRol;
 }

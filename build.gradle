@@ -8,6 +8,7 @@ buildscript {
         lombokVersion = '1.18.38'
         mapstructVersion = '1.6.3'
         springDocVersion = '2.8.11'
+        jsonwebtokenVersion = '0.12.7'
 	}
 }
 
@@ -32,7 +33,9 @@ sonar {
         property "sonar.java.coveragePlugin", "jacoco"
         property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacocoMergedReport/jacocoMergedReport.xml"
         property "sonar.pitest.reportPaths", "build/reports/pitest/mutations.xml"
-        property "sonar.externalIssuesReportPaths", "build/issues.json"
+        //property "sonar.externalIssuesReportPaths", "build/issues.json"
+        property "sonar.projectKey", "crediya-autenticacion"
+        property "sonar.host.url", "http://localhost:9000 "
     }
 }
 

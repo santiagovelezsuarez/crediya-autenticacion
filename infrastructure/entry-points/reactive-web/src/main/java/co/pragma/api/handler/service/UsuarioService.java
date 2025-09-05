@@ -5,6 +5,8 @@ import co.pragma.api.dto.DtoValidatorBuilder;
 import co.pragma.api.dto.RegistrarUsuarioDTO;
 import co.pragma.api.dto.UsuarioDtoMapper;
 import co.pragma.api.security.JwtService;
+import co.pragma.api.security.SessionValidator;
+import co.pragma.model.security.Permission;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.PasswordEncoderService;
 import co.pragma.model.usuario.gateways.SessionProvider;
@@ -19,6 +21,7 @@ import reactor.core.publisher.Mono;
 public class UsuarioService {
 
     private final UsuarioUseCase usuarioUseCase;
+    private final SessionValidator sessionValidator;
     private final UsuarioDtoMapper usuarioDtoMapper;
     private final Validator validator;
     private final JwtService jwtService;
@@ -36,9 +39,12 @@ public class UsuarioService {
     }
 
     private Mono<Usuario> processRegistrationDTO(RegistrarUsuarioDTO dto) {
-        return DtoValidatorBuilder.validate(dto, validator)
-                .flatMap(this::hashPassword)
-                .flatMap(this::registerUserWithSession);
+        return sessionProvider.getCurrentSession()
+                .flatMap(session -> sessionValidator.validatePermission(session, Permission.REGISTRAR_USUARIO)
+                        .then(DtoValidatorBuilder.validate(dto, validator))
+                        .flatMap(this::hashPassword)
+                        .flatMap(user -> usuarioUseCase.registerUser(user, session))
+                );
     }
 
     private Mono<Usuario> hashPassword(RegistrarUsuarioDTO dto) {
@@ -47,11 +53,6 @@ public class UsuarioService {
                 .map(hash -> user.toBuilder()
                         .passwordHash(hash)
                         .build());
-    }
-
-    private Mono<Usuario> registerUserWithSession(Usuario user) {
-        return sessionProvider.getCurrentSession()
-                .flatMap(session -> usuarioUseCase.registerUser(user, session));
     }
 
     public record AuthResult(Usuario usuario, String token) {}

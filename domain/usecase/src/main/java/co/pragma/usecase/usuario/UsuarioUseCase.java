@@ -4,6 +4,7 @@ import co.pragma.exception.*;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.rol.RolEnum;
 import co.pragma.model.rol.gateways.RolRepository;
+import co.pragma.model.security.Role;
 import co.pragma.model.usuario.Session;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.PasswordEncoderService;
@@ -14,7 +15,6 @@ import co.pragma.usecase.usuario.businessrules.UniqueDocumentoIdentidadValidator
 import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-
 import java.math.BigDecimal;
 
 @RequiredArgsConstructor
@@ -32,14 +32,16 @@ public class UsuarioUseCase {
         if(!RolEnum.ADMIN.getNombre().equals(session.getRole()))
             return Mono.error(new ForbiddenException("No tiene permisos para registrar usuarios"));
 
-        return salarioRangeValidator.validate(user.getSalarioBase())
+        return Mono.justOrEmpty(session.getRole())
+                .map(Role::valueOf)
+                .filter(rol -> rol.hasPermission(co.pragma.model.security.Permission.REGISTRAR_USUARIO))
+                .switchIfEmpty(Mono.error(new ForbiddenException("No tiene permisos para registrar usuarios")))
+                .then(salarioRangeValidator.validate(user.getSalarioBase()))
                 .then(uniqueEmailValidator.validate(user.getEmail()))
                 .then(uniqueDocumentoIdentidadValidator.validate(user.getTipoDocumento().name(), user.getNumeroDocumento()))
                 .then(rolResolver.resolve(user.getRol().getNombre()))
                 .flatMap(rol -> {
-                    var newUser = user.toBuilder()
-                            .rol(rol)
-                            .build();
+                    var newUser = user.toBuilder().rol(rol).build();
                     return userRepository.save(newUser);
                 })
                 .onErrorMap(e -> {

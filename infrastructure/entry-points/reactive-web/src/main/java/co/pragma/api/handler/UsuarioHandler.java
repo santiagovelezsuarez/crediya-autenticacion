@@ -3,6 +3,7 @@ package co.pragma.api.handler;
 import co.pragma.api.dto.*;
 import co.pragma.api.handler.service.ResponseService;
 import co.pragma.api.handler.service.UsuarioService;
+import co.pragma.api.security.SessionValidator;
 import co.pragma.exception.UsuarioNotFoundException;
 import co.pragma.usecase.usuario.UsuarioUseCase;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,10 @@ public class UsuarioHandler {
     private final UsuarioDtoMapper usuarioDtoMapper;
 
     public Mono<ServerResponse> listenRegisterUser(ServerRequest serverRequest) {
-        log.info("Petición recibida para registrar usuario");
+        log.debug("Petición recibida para registrar usuario");
         return serverRequest.bodyToMono(RegistrarUsuarioDTO.class)
                 .flatMap(usuarioService::registerUser)
-                .doOnNext(user -> log.info("Usuario registrado con éxito: {}", user.getEmail()))
+                .doOnNext(user -> log.trace("Usuario registrado con éxito: {}", user.getEmail()))
                 .map(usuarioDtoMapper::toResponse)
                 .flatMap(responseService::createdJson);
     }

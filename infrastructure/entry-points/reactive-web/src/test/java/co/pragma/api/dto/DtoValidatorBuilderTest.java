@@ -27,7 +27,9 @@ class DtoValidatorBuilderTest {
                 .tipoDocumento("CC")
                 .numeroDocumento("123456")
                 .email("john.doe@mail.com")
+                .password("password")
                 .salarioBase(BigDecimal.valueOf(2000))
+                .rol("ADMIN")
                 .build();
 
         StepVerifier.create(DtoValidatorBuilder.validate(dto, validator))

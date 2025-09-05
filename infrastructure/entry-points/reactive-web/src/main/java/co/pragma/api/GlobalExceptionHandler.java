@@ -4,6 +4,7 @@ import co.pragma.api.dto.DtoValidationException;
 import co.pragma.api.dto.ErrorResponse;
 import co.pragma.exception.BusinessException;
 import co.pragma.exception.DomainError;
+import co.pragma.exception.InfrastructureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,6 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,6 +42,19 @@ public class GlobalExceptionHandler {
         return Mono.just(ResponseEntity
                 .status(status)
                 .body(error));
+    }
+
+    @ExceptionHandler(InfrastructureException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handle(InfrastructureException ex, ServerHttpRequest request) {
+        log.error("Infrastructure error detected: {}", ex.getMessage(), ex);
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error("TECHNICAL_ERROR")
+                .message("Ocurrió un error interno, por favor intente más tarde.")
+                .path(request.getPath().value())
+                .build();
+        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error));
     }
 
     @ExceptionHandler(DtoValidationException.class)

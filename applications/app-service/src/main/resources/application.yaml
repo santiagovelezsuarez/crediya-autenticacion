@@ -11,6 +11,11 @@ spring:
       path: "/h2"
   profiles:
     include: null
+  http:
+    encoding:
+      enabled: true
+      charset: "UTF-8"
+      force: true
 management:
   endpoints:
     web:
@@ -20,6 +25,13 @@ management:
     health:
       probes:
         enabled: true
+
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY:8d0ec032515e2e10331c05c99086f2a117ab8c23cd19ec71209cf77354c38870}
+    expiration-time: ${JWT_EXPIRATION:86400}
+    issuer: ${JWT_ISSUER:crediya-autenticacion}
+
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 

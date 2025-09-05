@@ -37,7 +37,14 @@ public class RegistrarUsuarioDTO {
     @Email(message = "El campo email debe ser una dirección de correo electrónico válida")
     private String email;
 
+    @NotBlank(message = "El campo password no puede estar vacío")
+    private String password;
+
     @NotNull(message = "El salario base es obligatorio")
     @Positive(message = "El salario debe ser positivo")
     private BigDecimal salarioBase;
+
+    @NotBlank(message = "El campo rol no puede estar vacío")
+    @Pattern(regexp = "ADMIN|ASESOR|CLIENTE", message = "El rol no es válido. Debe ser ADMIN, ASESOR o CLIENTE.")
+    private String rol;
 }

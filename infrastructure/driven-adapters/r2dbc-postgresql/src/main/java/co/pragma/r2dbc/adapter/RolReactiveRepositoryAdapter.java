@@ -1,5 +1,7 @@
 package co.pragma.r2dbc.adapter;
 
+import co.pragma.error.ErrorCode;
+import co.pragma.exception.InfrastructureException;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.rol.gateways.RolRepository;
 import co.pragma.r2dbc.repository.RolReactiveRepository;
@@ -28,8 +30,8 @@ public class RolReactiveRepositoryAdapter extends ReactiveAdapterOperations<
         log.debug("Buscando rol por ID: {}", id);
         return repository.findById(id)
                 .map(entity -> mapper.map(entity, Rol.class))
-                .doOnNext(rol -> log.trace("Rol encontrado: {}", rol))
-                .doOnError(e -> log.error("Error al buscar rol con ID {} : {}", id, e.getMessage()));
+                .doOnNext(rol -> log.trace("findById - Rol encontrado: {}", rol))
+                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 
     @Override
@@ -38,6 +40,6 @@ public class RolReactiveRepositoryAdapter extends ReactiveAdapterOperations<
         return repository.findByNombre(nombre)
                 .map(entity -> mapper.map(entity, Rol.class))
                 .doOnNext(rol -> log.trace("Rol encontrado: {}", rol))
-                .doOnError(e -> log.error("Error al buscar rol con nombre {} : {}", nombre, e.getMessage()));
+                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 }

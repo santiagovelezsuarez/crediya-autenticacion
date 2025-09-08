@@ -1,5 +1,6 @@
 package co.pragma.r2dbc.adapter;
 
+import co.pragma.error.ErrorCode;
 import co.pragma.exception.InfrastructureException;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
@@ -26,7 +27,7 @@ public class UsuarioReactiveRepositoryAdapter implements UsuarioRepository {
         return usuarioRepository.save(mapper.toEntity(usuario))
                 .flatMap(this::mapToUsuario)
                 .doOnNext(u -> log.trace("Usuario registrado con éxito: {}", u.getEmail()))
-                .onErrorMap(ex -> new InfrastructureException("DB_ERROR", ex));
+                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 
     @Override
@@ -34,8 +35,8 @@ public class UsuarioReactiveRepositoryAdapter implements UsuarioRepository {
         log.debug("Buscando usuario por email: {}", email);
         return usuarioRepository.findByEmail(email)
                 .flatMap(this::mapToUsuario)
-                .doOnNext(u -> log.trace("Usuario encontrado: {}", u.getEmail()))
-                .onErrorMap(ex -> new InfrastructureException("DB_ERROR", ex));
+                .doOnNext(u -> log.trace("findByEmail - Usuario encontrado: {}", u.getEmail()))
+                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 
     @Override
@@ -43,8 +44,8 @@ public class UsuarioReactiveRepositoryAdapter implements UsuarioRepository {
         log.debug("Buscando usuario por tipo y número de documento: {} {}", tipoDocumento, numeroDocumento);
         return usuarioRepository.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento)
                 .flatMap(this::mapToUsuario)
-                .doOnNext(u -> log.trace("Usuario encontrado: {}", u))
-                .onErrorMap(ex -> new InfrastructureException("DB_ERROR", ex));
+                .doOnNext(u -> log.trace("findByTipoDocumentoAndNumeroDocumento - Usuario encontrado: {}", u))
+                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 
     private Mono<Usuario> mapToUsuario(UsuarioEntity entity) {

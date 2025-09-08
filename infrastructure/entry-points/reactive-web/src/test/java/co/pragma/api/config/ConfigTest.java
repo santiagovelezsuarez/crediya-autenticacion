@@ -32,7 +32,6 @@ class ConfigTest {
     @MockitoBean
     private JwtService jwtService;
 
-
     @MockitoBean
     private UsuarioService usuarioService;
 

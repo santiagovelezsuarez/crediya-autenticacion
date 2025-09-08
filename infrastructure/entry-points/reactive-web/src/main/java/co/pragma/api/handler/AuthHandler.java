@@ -22,11 +22,7 @@ public class AuthHandler {
         return serverRequest.bodyToMono(AutenticarUsuarioDTO.class)
                 .flatMap(usuarioService::authenticate)
                 .map(this::toLoginResponseDTO)
-                .flatMap(responseService::okJson)
-                .onErrorResume(ex -> {
-                    log.debug("Error en handler de autenticación, delegando a GlobalExceptionHandler");
-                    return Mono.error(ex);
-                });
+                .flatMap(responseService::okJson);
     }
 
     private LoginResponseDTO toLoginResponseDTO(UsuarioService.AuthResult res) {

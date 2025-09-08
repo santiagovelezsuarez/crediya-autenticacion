@@ -4,10 +4,15 @@ import co.pragma.api.dto.AutenticarUsuarioDTO;
 import co.pragma.api.dto.RegistrarUsuarioDTO;
 import co.pragma.api.dto.UsuarioDtoMapper;
 import co.pragma.api.security.JwtService;
+import co.pragma.api.security.SessionValidator;
+import co.pragma.exception.business.AuthenticationException;
+import co.pragma.exception.business.ForbiddenException;
+import co.pragma.model.rol.Permission;
 import co.pragma.model.usuario.Session;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.PasswordEncoderService;
 import co.pragma.model.usuario.gateways.SessionProvider;
+import co.pragma.usecase.usuario.AutenticarUsuarioUseCase;
 import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,10 +23,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.Collections;
-import java.util.UUID;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -30,105 +31,132 @@ class UsuarioServiceTest {
 
     @Mock
     private RegistrarUsuarioUseCase registrarUsuarioUseCase;
-
+    @Mock
+    private AutenticarUsuarioUseCase autenticarUsuarioUseCase;
+    @Mock
+    private SessionValidator sessionValidator;
     @Mock
     private UsuarioDtoMapper usuarioDtoMapper;
-
-    @Mock
-    private JwtService jwtService;
-
-    @Mock
-    private SessionProvider sessionProvider;
-
-    @Mock
-    private PasswordEncoderService passwordEncoderService;
-
     @Mock
     private Validator validator;
+    @Mock
+    private JwtService jwtService;
+    @Mock
+    private SessionProvider sessionProvider;
+    @Mock
+    private PasswordEncoderService passwordEncoderService;
 
     @InjectMocks
     private UsuarioService usuarioService;
 
+    private Usuario usuario;
+    private RegistrarUsuarioDTO dto;
+    private Session session;
+
     @BeforeEach
     void setUp() {
-        when(validator.validate(any())).thenReturn(Collections.emptySet());
-        usuarioService = new UsuarioService(
-                registrarUsuarioUseCase,
-                usuarioDtoMapper,
-                validator,
-                jwtService,
-                sessionProvider,
-                passwordEncoderService
-        );
-    }
-
-    @Test
-    void registerUserShouldHashPasswordAndRegister() {
-        RegistrarUsuarioDTO dto = new RegistrarUsuarioDTO();
-        dto.setEmail("test@mail.com");
-        dto.setPassword("plain-pass");
-
-        Usuario mappedUser = Usuario.builder()
-                .email("test@mail.com")
-                .build();
-
-        Usuario hashedUser = mappedUser.toBuilder()
+        usuario = Usuario.builder()
+                .email("jhondoe@mail.com")
                 .passwordHash("hashed-pass")
                 .build();
 
-        Session fakeSession = Session.builder()
-                .userId("admin-id")
-                .role("ADMIN")
+        dto = RegistrarUsuarioDTO.builder()
+                .email("jhondoe@mail.co")
+                .password("secret")
+                .nombres("Jhon")
+                .apellidos("Doe")
                 .build();
 
-        Usuario savedUser = hashedUser.toBuilder().id(UUID.randomUUID()).build();
-
-        when(usuarioDtoMapper.toModel(dto)).thenReturn(mappedUser);
-        when(passwordEncoderService.encodeReactive("plain-pass")).thenReturn(Mono.just("hashed-pass"));
-        when(sessionProvider.getCurrentSession()).thenReturn(Mono.just(fakeSession));
-        when(registrarUsuarioUseCase.registerUser(hashedUser, fakeSession))
-                .thenReturn(Mono.just(savedUser));
-
-        StepVerifier.create(usuarioService.registerUser(dto))
-                .assertNext(user -> assertThat(user.getPasswordHash()).isEqualTo("hashed-pass"))
-                .verifyComplete();
-
-        verify(passwordEncoderService).encodeReactive("plain-pass");
-        verify(registrarUsuarioUseCase).registerUser(any(Usuario.class), any());
+        session = mock(Session.class);
     }
 
     @Test
-    void authenticateShouldReturnAuthResultWithToken() {
-        AutenticarUsuarioDTO dto = new AutenticarUsuarioDTO();
-        dto.setEmail("test@mail.com");
-        dto.setPassword("plain-pass");
+    void authenticateShouldReturnAuthResultWhenSuccessful() {
+        AutenticarUsuarioDTO dto = new AutenticarUsuarioDTO("jhondoe@mail.com", "secret");
 
-        Usuario usuario = Usuario.builder()
-                .id(UUID.randomUUID())
-                .email("test@mail.com")
-                .build();
-
-        when(registrarUsuarioUseCase.authenticate("test@mail.com", "plain-pass")).thenReturn(Mono.just(usuario));
+        when(autenticarUsuarioUseCase.execute(dto.getEmail(), dto.getPassword()))
+                .thenReturn(Mono.just(usuario));
         when(jwtService.generateToken(usuario)).thenReturn("jwt-token");
 
         StepVerifier.create(usuarioService.authenticate(dto))
-                .assertNext(authResult -> {
-                    assertThat(authResult.usuario()).isEqualTo(usuario);
-                    assertThat(authResult.token()).isEqualTo("jwt-token");
-                })
+                .expectNextMatches(authResult ->
+                        authResult.usuario().equals(usuario) &&
+                                authResult.token().equals("jwt-token"))
                 .verifyComplete();
-
-        verify(jwtService).generateToken(usuario);
     }
 
     @Test
-    void authenticateShouldErrorWhenInvalidDto() {
-        AutenticarUsuarioDTO dto = new AutenticarUsuarioDTO();
-        dto.setEmail("invalid_email");
-        dto.setPassword("8888888");
+    void authenticateShouldFailWhenInvalidCredentials() {
+        AutenticarUsuarioDTO dto = new AutenticarUsuarioDTO("wrong@mail.com", "bad");
+
+        when(autenticarUsuarioUseCase.execute(dto.getEmail(), dto.getPassword()))
+                .thenReturn(Mono.error(new AuthenticationException()));
 
         StepVerifier.create(usuarioService.authenticate(dto))
-                .expectErrorMatches(RuntimeException.class::isInstance)
+                .expectError(AuthenticationException.class)
+                .verify();
+    }
+
+    @Test
+    void registerUserShouldSucceedWhenAllValidationsPass() {
+       Usuario mappedUser = usuario.toBuilder().passwordHash(null).build();
+
+        when(sessionProvider.getCurrentSession()).thenReturn(Mono.just(session));
+        when(sessionValidator.validatePermission(session, Permission.REGISTRAR_USUARIO)).thenReturn(Mono.empty());
+        when(usuarioDtoMapper.toModel(dto)).thenReturn(mappedUser);
+        when(passwordEncoderService.encodeReactive(dto.getPassword())).thenReturn(Mono.just("hashed-pass"));
+        when(registrarUsuarioUseCase.execute(any(Usuario.class), eq(session)))
+                .thenReturn(Mono.just(usuario));
+
+        StepVerifier.create(usuarioService.registerUser(dto))
+                .expectNextMatches(u -> u.getEmail().equals("jhondoe@mail.com") &&
+                        u.getPasswordHash().equals("hashed-pass"))
+                .verifyComplete();
+    }
+
+    @Test
+    void registerUserShouldFailWhenPermissionDenied() {
+        when(sessionProvider.getCurrentSession()).thenReturn(Mono.just(session));
+        when(sessionValidator.validatePermission(session, Permission.REGISTRAR_USUARIO))
+                .thenReturn(Mono.error(new ForbiddenException()));
+
+        StepVerifier.create(usuarioService.registerUser(dto))
+                .expectError(ForbiddenException.class)
+                .verify();
+
+        verifyNoInteractions(registrarUsuarioUseCase);
+    }
+
+    @Test
+    void registerUserShouldFailWhenPasswordEncodingFails() {
+        Usuario mappedUser = usuario.toBuilder().passwordHash(null).build();
+
+        when(sessionProvider.getCurrentSession()).thenReturn(Mono.just(session));
+        when(sessionValidator.validatePermission(session, Permission.REGISTRAR_USUARIO)).thenReturn(Mono.empty());
+        when(usuarioDtoMapper.toModel(dto)).thenReturn(mappedUser);
+        when(passwordEncoderService.encodeReactive(dto.getPassword()))
+                .thenReturn(Mono.error(new RuntimeException("Encoder failed")));
+
+        StepVerifier.create(usuarioService.registerUser(dto))
+                .expectErrorMatches(error -> error instanceof RuntimeException &&
+                        error.getMessage().equals("Encoder failed"))
+                .verify();
+    }
+
+    @Test
+    void registerUserShouldFailWhenUseCaseFails() {
+        Usuario mappedUser = usuario.toBuilder().passwordHash(null).build();
+
+        when(sessionProvider.getCurrentSession()).thenReturn(Mono.just(session));
+        when(sessionValidator.validatePermission(session, Permission.REGISTRAR_USUARIO)).thenReturn(Mono.empty());
+        when(usuarioDtoMapper.toModel(dto)).thenReturn(mappedUser);
+        when(passwordEncoderService.encodeReactive(dto.getPassword())).thenReturn(Mono.just("hashed-pass"));
+        when(registrarUsuarioUseCase.execute(any(Usuario.class), eq(session)))
+                .thenReturn(Mono.error(new RuntimeException("DB down")));
+
+        StepVerifier.create(usuarioService.registerUser(dto))
+                .expectErrorMatches(error -> error instanceof RuntimeException &&
+                        error.getMessage().equals("DB down"))
                 .verify();
     }
 }

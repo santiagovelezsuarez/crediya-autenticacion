@@ -1,6 +1,6 @@
 package co.pragma.usecase.usuario.businessrules;
 
-import co.pragma.error.ErrorMessages;
+import co.pragma.error.ErrorCode;
 import co.pragma.exception.business.SalarioBaseException;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -14,10 +14,10 @@ public class SalarioRangeValidator {
 
     public Mono<Void> validate(BigDecimal salario) {
         if (salario.compareTo(MIN_SALARY) <= 0)
-            return Mono.error(new SalarioBaseException(ErrorMessages.SALARY_OUT_OF_RANGE_MIN));
+            return Mono.error(new SalarioBaseException(ErrorCode.SALARIO_OUT_OF_RANGE, "El salario base debe ser mayor a 0."));
 
         if (salario.compareTo(maxSalary) > 0)
-            return Mono.error(new SalarioBaseException(ErrorMessages.SALARY_OUT_OF_RANGE_MAX + maxSalary));
+            return Mono.error(new SalarioBaseException(ErrorCode.SALARIO_OUT_OF_RANGE, "El salario base debe ser mayor a " + maxSalary));
 
         return Mono.empty();
     }

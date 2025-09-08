@@ -5,7 +5,6 @@ import co.pragma.api.dto.DtoValidationException;
 import co.pragma.api.dto.ErrorResponse;
 import co.pragma.error.DomainError;
 import co.pragma.error.ErrorCode;
-import co.pragma.error.ErrorMessages;
 import co.pragma.exception.*;
 import co.pragma.exception.business.BusinessException;
 import org.springframework.boot.autoconfigure.web.WebProperties;
@@ -57,16 +56,15 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
     }
 
     private Mono<ServerResponse>  handleBusinessException(BusinessException ex, ServerRequest request) {
-        DomainError domainError = DomainError.from(ex);
         HttpStatus status = errorCodeHttpMapper.toHttpStatus(ex.getCode());
 
-        return buildResponse(ErrorContext.of(request, status, domainError.code(), domainError.message()));
+        return buildResponse(ErrorContext.of(request, status, ex.getCode(), ex.getMessage()));
     }
 
     private Mono<ServerResponse>  handleInfrastructureException(ServerRequest request) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        return buildResponse(ErrorContext.of(request, status, String.valueOf(ErrorCode.TECHNICAL_ERROR), ErrorMessages.GENERIC_INTERNAL));
+        return buildResponse(ErrorContext.of(request, status, ErrorCode.TECHNICAL_ERROR));
     }
 
     private Mono<ServerResponse>  handleValidationException(DtoValidationException ex, ServerRequest request) {
@@ -75,18 +73,18 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
                 .map(err -> new ErrorResponse.FieldError(err.field(), err.message()))
                 .toList();
 
-        return buildResponse(ErrorContext.ofValidation(request, status, String.valueOf(ErrorCode.INVALID_INPUT), ErrorMessages.INVALID_INPUT, fieldErrors));
+        return buildResponse(ErrorContext.ofValidation(request, status, ErrorCode.INVALID_INPUT, fieldErrors));
 
     }
 
     private Mono<ServerResponse>  handleWebInputException(ServerRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        return buildResponse(ErrorContext.of(request, status, String.valueOf(ErrorCode.INVALID_REQUEST), ErrorMessages.INVALID_REQUEST));
+        return buildResponse(ErrorContext.of(request, status, ErrorCode.INVALID_REQUEST));
     }
 
     private Mono<ServerResponse>  handleDefaultException(ServerRequest request) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        return buildResponse(ErrorContext.of(request, status, String.valueOf(ErrorCode.INTERNAL_SERVER_ERROR), ErrorMessages.GENERIC_INTERNAL));
+        return buildResponse(ErrorContext.of(request, status, ErrorCode.INTERNAL_SERVER_ERROR));
     }
 
     private Mono<ServerResponse> buildResponse(ErrorContext context) {
@@ -114,7 +112,7 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
             log.warn("BusinessException at {} {}: {} - code={}", method, path, be.getMessage(), be.getCode());
 
         else if (ex instanceof InfrastructureException ie)
-            log.error("InfrastructureException at {} {}: {} (cause: {})", method, path, ie.getMessage(),rootCauseMsg);
+            log.error("InfrastructureException at {} {}: {} (cause: {})", method, path, ie.getMessage(), rootCauseMsg);
 
         else if (ex instanceof DtoValidationException ve)
             log.info("Validation error at {} {}: {}", method, path, ve.getMessage());

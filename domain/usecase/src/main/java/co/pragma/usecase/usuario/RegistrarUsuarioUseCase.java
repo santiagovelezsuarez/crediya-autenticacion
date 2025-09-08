@@ -1,12 +1,13 @@
 package co.pragma.usecase.usuario;
 
-import co.pragma.error.ErrorMessages;
 import co.pragma.exception.business.ForbiddenException;
-import co.pragma.model.security.Role;
+import co.pragma.exception.business.RolNotFoundException;
+import co.pragma.model.rol.Permission;
+import co.pragma.model.rol.RolEnum;
+import co.pragma.model.rol.gateways.RolRepository;
 import co.pragma.model.usuario.Session;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
-import co.pragma.usecase.usuario.businessrules.RolResolver;
 import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
 import co.pragma.usecase.usuario.businessrules.UniqueDocumentoIdentidadValidator;
 import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
@@ -17,28 +18,29 @@ import reactor.core.publisher.Mono;
 public class RegistrarUsuarioUseCase {
 
     private final UsuarioRepository userRepository;
-    private final RolResolver rolResolver;
+    private final RolRepository rolRepository;
     private final SalarioRangeValidator salarioRangeValidator;
     private final UniqueEmailValidator uniqueEmailValidator;
     private final UniqueDocumentoIdentidadValidator uniqueDocumentoIdentidadValidator;
 
     public Mono<Usuario> execute(Usuario user, Session session) {
         return validatePermission(session)
-                .then(validateBusinessRules(user))
-                .then(resolveRole(user))
+                .then(Mono.defer(() -> validateBusinessRules(user)))
+                .then(Mono.defer(() -> resolveRole(user)))
                 .flatMap(userRepository::save);
     }
 
     private Mono<Usuario> resolveRole(Usuario user) {
-        return rolResolver.resolve(user.getRol().getNombre())
+        return rolRepository.findByNombre(user.getRol().getNombre())
+                .switchIfEmpty(Mono.error(new RolNotFoundException()))
                 .map(rol -> user.toBuilder().rol(rol).build());
     }
 
     private Mono<Void> validatePermission(Session session) {
         return Mono.justOrEmpty(session.getRole())
-                .map(Role::valueOf)
-                .filter(rol -> rol.hasPermission(co.pragma.model.security.Permission.REGISTRAR_USUARIO))
-                .switchIfEmpty(Mono.error(new ForbiddenException(ErrorMessages.FORBIDDEN)))
+                .map(RolEnum::valueOf)
+                .filter(rol -> rol.hasPermission(Permission.REGISTRAR_USUARIO))
+                .switchIfEmpty(Mono.error(new ForbiddenException()))
                 .then();
     }
 

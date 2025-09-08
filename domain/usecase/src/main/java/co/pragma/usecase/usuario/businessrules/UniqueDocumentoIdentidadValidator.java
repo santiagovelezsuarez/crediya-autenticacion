@@ -1,6 +1,5 @@
 package co.pragma.usecase.usuario.businessrules;
 
-import co.pragma.error.ErrorMessages;
 import co.pragma.exception.business.DocumentoIdentidadAlreadyRegisteredException;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,7 @@ public class UniqueDocumentoIdentidadValidator {
 
     public Mono<Void> validate(String tipoDocumento, String numeroDocumento) {
         return usuarioRepository.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento)
-                .flatMap(u -> Mono.error(new DocumentoIdentidadAlreadyRegisteredException(ErrorMessages.DOCUMENT_ALREADY_EXISTS)))
+                .flatMap(u -> Mono.error(new DocumentoIdentidadAlreadyRegisteredException()))
                 .switchIfEmpty(Mono.empty())
                 .then();
     }

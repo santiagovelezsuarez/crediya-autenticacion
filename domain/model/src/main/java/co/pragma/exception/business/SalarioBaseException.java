@@ -3,7 +3,11 @@ package co.pragma.exception.business;
 import co.pragma.error.ErrorCode;
 
 public class SalarioBaseException extends BusinessException {
-    public SalarioBaseException(String message) {
-        super(ErrorCode.SALARIO_OUT_OF_RANGE, message);
+    public SalarioBaseException(ErrorCode code) {
+        super(code);
+    }
+
+    public SalarioBaseException(ErrorCode code, String customMessage) {
+        super(code, customMessage);
     }
 }

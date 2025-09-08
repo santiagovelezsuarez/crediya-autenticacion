@@ -1,7 +1,6 @@
 package co.pragma.usecase.usuario;
 
 import co.pragma.exception.business.AuthenticationException;
-import co.pragma.error.ErrorMessages;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.PasswordEncoderService;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
@@ -16,7 +15,7 @@ public class AutenticarUsuarioUseCase {
 
     public Mono<Usuario> execute(String email, String password) {
         return userRepository.findByEmail(email)
-                .switchIfEmpty(Mono.error(new AuthenticationException(ErrorMessages.INVALID_CREDENTIALS)))
+                .switchIfEmpty(Mono.error(new AuthenticationException()))
                 .flatMap(usuario -> validatePassword(usuario, password));
     }
 
@@ -24,6 +23,6 @@ public class AutenticarUsuarioUseCase {
         if (passwordEncoderService.matches(rawPassword, usuario.getPasswordHash()))
             return Mono.just(usuario);
 
-        return Mono.error(new AuthenticationException(ErrorMessages.INVALID_CREDENTIALS));
+        return Mono.error(new AuthenticationException());
     }
 }

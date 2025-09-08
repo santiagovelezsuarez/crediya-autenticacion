@@ -8,7 +8,7 @@ import co.pragma.model.usuario.Session;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.PasswordEncoderService;
 import co.pragma.model.usuario.gateways.SessionProvider;
-import co.pragma.usecase.usuario.UsuarioUseCase;
+import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 class UsuarioServiceTest {
 
     @Mock
-    private UsuarioUseCase usuarioUseCase;
+    private RegistrarUsuarioUseCase registrarUsuarioUseCase;
 
     @Mock
     private UsuarioDtoMapper usuarioDtoMapper;
@@ -53,7 +53,7 @@ class UsuarioServiceTest {
     void setUp() {
         when(validator.validate(any())).thenReturn(Collections.emptySet());
         usuarioService = new UsuarioService(
-                usuarioUseCase,
+                registrarUsuarioUseCase,
                 usuarioDtoMapper,
                 validator,
                 jwtService,
@@ -86,7 +86,7 @@ class UsuarioServiceTest {
         when(usuarioDtoMapper.toModel(dto)).thenReturn(mappedUser);
         when(passwordEncoderService.encodeReactive("plain-pass")).thenReturn(Mono.just("hashed-pass"));
         when(sessionProvider.getCurrentSession()).thenReturn(Mono.just(fakeSession));
-        when(usuarioUseCase.registerUser(hashedUser, fakeSession))
+        when(registrarUsuarioUseCase.registerUser(hashedUser, fakeSession))
                 .thenReturn(Mono.just(savedUser));
 
         StepVerifier.create(usuarioService.registerUser(dto))
@@ -94,7 +94,7 @@ class UsuarioServiceTest {
                 .verifyComplete();
 
         verify(passwordEncoderService).encodeReactive("plain-pass");
-        verify(usuarioUseCase).registerUser(any(Usuario.class), any());
+        verify(registrarUsuarioUseCase).registerUser(any(Usuario.class), any());
     }
 
     @Test
@@ -108,7 +108,7 @@ class UsuarioServiceTest {
                 .email("test@mail.com")
                 .build();
 
-        when(usuarioUseCase.authenticate("test@mail.com", "plain-pass")).thenReturn(Mono.just(usuario));
+        when(registrarUsuarioUseCase.authenticate("test@mail.com", "plain-pass")).thenReturn(Mono.just(usuario));
         when(jwtService.generateToken(usuario)).thenReturn("jwt-token");
 
         StepVerifier.create(usuarioService.authenticate(dto))

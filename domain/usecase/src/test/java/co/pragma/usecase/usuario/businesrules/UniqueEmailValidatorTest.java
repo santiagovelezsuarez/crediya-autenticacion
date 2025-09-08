@@ -1,6 +1,6 @@
 package co.pragma.usecase.usuario.businesrules;
 
-import co.pragma.exception.EmailAlreadyRegisteredException;
+import co.pragma.exception.business.EmailAlreadyRegisteredException;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;

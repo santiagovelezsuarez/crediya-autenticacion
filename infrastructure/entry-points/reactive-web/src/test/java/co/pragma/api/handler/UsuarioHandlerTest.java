@@ -5,9 +5,9 @@ import co.pragma.api.dto.UsuarioDtoMapper;
 import co.pragma.api.dto.UsuarioResponse;
 import co.pragma.api.handler.service.ResponseService;
 import co.pragma.api.handler.service.UsuarioService;
-import co.pragma.exception.UsuarioNotFoundException;
+import co.pragma.exception.business.UsuarioNotFoundException;
 import co.pragma.model.usuario.Usuario;
-import co.pragma.usecase.usuario.UsuarioUseCase;
+import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,7 +27,7 @@ class UsuarioHandlerTest {
     private UsuarioService usuarioService;
 
     @Mock
-    private UsuarioUseCase usuarioUseCase;
+    private RegistrarUsuarioUseCase registrarUsuarioUseCase;
 
     @Mock
     private ResponseService responseService;
@@ -74,7 +74,7 @@ class UsuarioHandlerTest {
         when(request.pathVariable("tipoDocumento")).thenReturn(tipo);
         when(request.pathVariable("numeroDocumento")).thenReturn(numero);
 
-        when(usuarioUseCase.findByDocumento(numero, tipo)).thenReturn(Mono.just(usuario));
+        when(registrarUsuarioUseCase.findByDocumento(numero, tipo)).thenReturn(Mono.just(usuario));
         when(usuarioDtoMapper.toResponse(usuario)).thenReturn(responseDto);
         when(responseService.okJson(responseDto)).thenReturn(Mono.just(mock(ServerResponse.class)));
 
@@ -84,7 +84,7 @@ class UsuarioHandlerTest {
                 .expectNextCount(1)
                 .verifyComplete();
 
-        verify(usuarioUseCase).findByDocumento(numero, tipo);
+        verify(registrarUsuarioUseCase).findByDocumento(numero, tipo);
         verify(usuarioDtoMapper).toResponse(usuario);
         verify(responseService).okJson(responseDto);
     }
@@ -98,7 +98,7 @@ class UsuarioHandlerTest {
         when(request.pathVariable("tipoDocumento")).thenReturn(tipo);
         when(request.pathVariable("numeroDocumento")).thenReturn(numero);
 
-        when(usuarioUseCase.findByDocumento(numero, tipo)).thenReturn(Mono.empty());
+        when(registrarUsuarioUseCase.findByDocumento(numero, tipo)).thenReturn(Mono.empty());
 
         Mono<ServerResponse> result = handler.listenFindByDocumento(request);
 
@@ -106,7 +106,7 @@ class UsuarioHandlerTest {
                 .expectError(UsuarioNotFoundException.class)
                 .verify();
 
-        verify(usuarioUseCase).findByDocumento(numero, tipo);
+        verify(registrarUsuarioUseCase).findByDocumento(numero, tipo);
         verifyNoInteractions(usuarioDtoMapper);
         verifyNoInteractions(responseService);
     }

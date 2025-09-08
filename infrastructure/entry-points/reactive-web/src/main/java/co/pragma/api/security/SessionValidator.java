@@ -1,6 +1,6 @@
 package co.pragma.api.security;
 
-import co.pragma.exception.ForbiddenException;
+import co.pragma.exception.business.ForbiddenException;
 import co.pragma.model.security.Permission;
 import co.pragma.model.security.Role;
 import co.pragma.model.usuario.Session;

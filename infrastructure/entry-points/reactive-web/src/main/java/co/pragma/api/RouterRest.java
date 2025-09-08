@@ -77,8 +77,7 @@ public class RouterRest {
             )
     })
     public RouterFunction<ServerResponse> userRoutes(UsuarioHandler handler) {
-        return route(POST("/api/v1/usuarios"), handler::listenRegisterUser)
-                .andRoute(GET("/api/v1/usuarios/{tipoDocumento}/{numeroDocumento}"),handler::listenFindByDocumento);
+        return route(POST("/api/v1/usuarios"), handler::listenRegisterUser);
     }
 
     @Bean

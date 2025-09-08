@@ -1,4 +1,4 @@
-package co.pragma.exception;
+package co.pragma.error;
 
 public enum ErrorCode {
     EMAIL_ALREADY_REGISTERED,
@@ -7,5 +7,9 @@ public enum ErrorCode {
     USUARIO_NOT_FOUND,
     CREDENCIALES_INVALIDAS,
     ROL_NOT_FOUND,
-    FORBIDDEN;
+    FORBIDDEN,
+    TECHNICAL_ERROR,
+    INVALID_INPUT,
+    INVALID_REQUEST,
+    INTERNAL_SERVER_ERROR;
 }

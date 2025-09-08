@@ -6,7 +6,7 @@ import co.pragma.api.RouterRest;
 import co.pragma.api.dto.UsuarioDtoMapper;
 import co.pragma.api.handler.service.UsuarioService;
 import co.pragma.api.security.JwtService;
-import co.pragma.usecase.usuario.UsuarioUseCase;
+import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -37,7 +37,7 @@ class ConfigTest {
     private UsuarioService usuarioService;
 
     @MockitoBean
-    private UsuarioUseCase usuarioUseCase;
+    private RegistrarUsuarioUseCase registrarUsuarioUseCase;
 
     @MockitoBean
     private UsuarioDtoMapper usuarioDtoMapper;

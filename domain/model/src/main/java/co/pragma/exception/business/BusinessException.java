@@ -1,5 +1,6 @@
-package co.pragma.exception;
+package co.pragma.exception.business;
 
+import co.pragma.error.ErrorCode;
 import lombok.Getter;
 
 @Getter

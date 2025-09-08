@@ -1,6 +1,6 @@
 package co.pragma.usecase.usuario.businesrules;
 
-import co.pragma.exception.SalarioBaseException;
+import co.pragma.exception.business.SalarioBaseException;
 import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

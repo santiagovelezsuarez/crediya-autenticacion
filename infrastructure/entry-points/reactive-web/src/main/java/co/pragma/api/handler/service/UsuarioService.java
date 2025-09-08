@@ -6,11 +6,13 @@ import co.pragma.api.dto.RegistrarUsuarioDTO;
 import co.pragma.api.dto.UsuarioDtoMapper;
 import co.pragma.api.security.JwtService;
 import co.pragma.api.security.SessionValidator;
+import co.pragma.exception.InfrastructureException;
 import co.pragma.model.security.Permission;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.PasswordEncoderService;
 import co.pragma.model.usuario.gateways.SessionProvider;
-import co.pragma.usecase.usuario.UsuarioUseCase;
+import co.pragma.usecase.usuario.AutenticarUsuarioUseCase;
+import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UsuarioService {
 
-    private final UsuarioUseCase usuarioUseCase;
+    private final RegistrarUsuarioUseCase registrarUsuarioUseCase;
+    private final AutenticarUsuarioUseCase autenticarUsuarioUseCase;
     private final SessionValidator sessionValidator;
     private final UsuarioDtoMapper usuarioDtoMapper;
     private final Validator validator;
@@ -34,7 +37,7 @@ public class UsuarioService {
 
     public Mono<AuthResult> authenticate(AutenticarUsuarioDTO dto) {
         return DtoValidatorBuilder.validate(dto, validator)
-                .flatMap(vdto -> usuarioUseCase.authenticate(vdto.getEmail(), vdto.getPassword()))
+                .flatMap(vdto -> autenticarUsuarioUseCase.execute(vdto.getEmail(), vdto.getPassword()))
                 .map(usuario -> new AuthResult(usuario, jwtService.generateToken(usuario)));
     }
 
@@ -43,7 +46,7 @@ public class UsuarioService {
                 .flatMap(session -> sessionValidator.validatePermission(session, Permission.REGISTRAR_USUARIO)
                         .then(DtoValidatorBuilder.validate(dto, validator))
                         .flatMap(this::hashPassword)
-                        .flatMap(user -> usuarioUseCase.registerUser(user, session))
+                        .flatMap(user -> registrarUsuarioUseCase.execute(user, session))
                 );
     }
 

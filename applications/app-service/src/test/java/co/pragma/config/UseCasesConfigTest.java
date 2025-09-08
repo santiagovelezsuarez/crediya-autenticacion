@@ -1,7 +1,7 @@
 package co.pragma.config;
 
 import co.pragma.model.usuario.gateways.UsuarioRepository;
-import co.pragma.usecase.usuario.UsuarioUseCase;
+import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,8 +46,8 @@ class UseCasesConfigTest {
         }
 
         @Bean
-        public UsuarioUseCase usuarioUseCase() {
-            return Mockito.mock(UsuarioUseCase.class);
+        public RegistrarUsuarioUseCase usuarioUseCase() {
+            return Mockito.mock(RegistrarUsuarioUseCase.class);
         }
     }
 

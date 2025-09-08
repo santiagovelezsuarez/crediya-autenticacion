@@ -1,6 +1,6 @@
 package co.pragma.usecase.usuario.businesrules;
 
-import co.pragma.exception.RolNotFoundException;
+import co.pragma.exception.business.RolNotFoundException;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.rol.gateways.RolRepository;
 import co.pragma.usecase.usuario.businessrules.RolResolver;

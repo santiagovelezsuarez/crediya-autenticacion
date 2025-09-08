@@ -1,9 +1,7 @@
 package co.pragma.usecase.usuario;
 
-import co.pragma.exception.AuthenticationException;
-import co.pragma.exception.ForbiddenException;
+import co.pragma.exception.business.ForbiddenException;
 import co.pragma.exception.InfrastructureException;
-import co.pragma.exception.UsuarioNotFoundException;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.rol.RolEnum;
 import co.pragma.model.rol.gateways.RolRepository;
@@ -31,7 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UsuarioUseCaseTest {
+class RegistrarUsuarioUseCaseTest {
 
     @Mock
     private UsuarioRepository usuarioRepository;
@@ -61,7 +59,7 @@ class UsuarioUseCaseTest {
     private Session session;
 
     @InjectMocks()
-    private UsuarioUseCase usuarioUseCase;
+    private RegistrarUsuarioUseCase registrarUsuarioUseCase;
 
     @Test
     void shouldRegisterUserSuccessfully() {
@@ -86,35 +84,11 @@ class UsuarioUseCaseTest {
         when(usuarioRepository.save(usuario)).thenReturn(Mono.just(usuario));
         when(session.getRole()).thenReturn(RolEnum.ADMIN.getNombre());
 
-        StepVerifier.create(usuarioUseCase.registerUser(usuario, session))
+        StepVerifier.create(registrarUsuarioUseCase.execute(usuario, session))
                 .expectNextMatches(u -> u.getEmail().equals("jhondoe@example.co"))
                 .verifyComplete();
 
         verify(usuarioRepository).save(usuario);
-    }
-
-    @Test
-    void shouldfindByDocumentoSuccessfully() {
-        String numeroDocumento = "123456789";
-        String tipoDocumento = "CC";
-
-        Usuario usuario = Usuario.builder()
-                .id(UUID.fromString("33ac0a47-79bd-4d78-8d08-c9c707cfa529"))
-                .nombres("Jhon Doe")
-                .apellidos("Doe")
-                .fechaNacimiento(LocalDate.of(1990, 1, 1))
-                .direccion("123 Main St")
-                .telefono("1234567890")
-                .email("jhondoe@mail.co")
-                .salarioBase(BigDecimal.valueOf(3250000))
-                .build();
-
-        when(usuarioRepository.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento)).thenReturn(Mono.just(usuario));
-
-        StepVerifier.create(usuarioUseCase.findByDocumento(numeroDocumento, tipoDocumento))
-                .expectNextMatches(u -> u.getEmail().equals("jhondoe@mail.co"))
-                .verifyComplete();
-        verify(usuarioRepository).findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento);
     }
 
     @Test
@@ -127,7 +101,7 @@ class UsuarioUseCaseTest {
 
         when(session.getRole()).thenReturn("USER");
 
-        StepVerifier.create(usuarioUseCase.registerUser(usuario, session))
+        StepVerifier.create(registrarUsuarioUseCase.execute(usuario, session))
                 .expectError(ForbiddenException.class)
                 .verify();
     }
@@ -148,67 +122,8 @@ class UsuarioUseCaseTest {
         when(uniqueDocumentoIdentidadValidator.validate(any(), any())).thenReturn(Mono.empty());
         when(rolResolver.resolve(any())).thenReturn(Mono.just(usuario.getRol()));
 
-        StepVerifier.create(usuarioUseCase.registerUser(usuario, session))
+        StepVerifier.create(registrarUsuarioUseCase.execute(usuario, session))
                 .expectError(InfrastructureException.class)
-                .verify();
-    }
-
-    @Test
-    void findByDocumentoShouldReturnNotFoundWhenEmpty() {
-        when(usuarioRepository.findByTipoDocumentoAndNumeroDocumento("CC", "123"))
-                .thenReturn(Mono.empty());
-
-        StepVerifier.create(usuarioUseCase.findByDocumento("123", "CC"))
-                .expectError(UsuarioNotFoundException.class)
-                .verify();
-    }
-
-    @Test
-    void findByDocumentoShouldMapUnexpectedError() {
-        when(usuarioRepository.findByTipoDocumentoAndNumeroDocumento("CC", "123"))
-                .thenReturn(Mono.error(new RuntimeException("DB error")));
-
-        StepVerifier.create(usuarioUseCase.findByDocumento("123", "CC"))
-                .expectError(InfrastructureException.class)
-                .verify();
-    }
-
-    @Test
-    void authenticateShouldReturnUserWhenPasswordMatches() {
-        Usuario usuario = Usuario.builder()
-                .email("user@mail.com")
-                .passwordHash("hashed")
-                .build();
-
-        when(usuarioRepository.findByEmail("user@mail.com")).thenReturn(Mono.just(usuario));
-        when(passwordEncoderService.matches("plain", "hashed")).thenReturn(true);
-
-        StepVerifier.create(usuarioUseCase.authenticate("user@mail.com", "plain"))
-                .expectNext(usuario)
-                .verifyComplete();
-    }
-
-    @Test
-    void authenticateShouldFailWhenUserNotFound() {
-        when(usuarioRepository.findByEmail("notfound@mail.com")).thenReturn(Mono.empty());
-
-        StepVerifier.create(usuarioUseCase.authenticate("notfound@mail.com", "pwd"))
-                .expectError(AuthenticationException.class)
-                .verify();
-    }
-
-    @Test
-    void authenticateShouldFailWhenPasswordDoesNotMatch() {
-        Usuario usuario = Usuario.builder()
-                .email("user@mail.com")
-                .passwordHash("hashed")
-                .build();
-
-        when(usuarioRepository.findByEmail("user@mail.com")).thenReturn(Mono.just(usuario));
-        when(passwordEncoderService.matches("wrong", "hashed")).thenReturn(false);
-
-        StepVerifier.create(usuarioUseCase.authenticate("user@mail.com", "wrong"))
-                .expectError(AuthenticationException.class)
                 .verify();
     }
 }

@@ -1,8 +1,8 @@
 package co.pragma.config.beans;
 
 import co.pragma.api.security.SecurityContextSessionProvider;
-import co.pragma.model.rol.gateways.RolRepository;
 import co.pragma.model.usuario.gateways.SessionProvider;
+import co.pragma.model.rol.gateways.RolRepository;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.usecase.usuario.businessrules.RolResolver;
 import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;

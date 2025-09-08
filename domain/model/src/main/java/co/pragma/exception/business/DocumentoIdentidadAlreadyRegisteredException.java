@@ -1,4 +1,6 @@
-package co.pragma.exception;
+package co.pragma.exception.business;
+
+import co.pragma.error.ErrorCode;
 
 public class DocumentoIdentidadAlreadyRegisteredException extends BusinessException {
     public  DocumentoIdentidadAlreadyRegisteredException(String message) {

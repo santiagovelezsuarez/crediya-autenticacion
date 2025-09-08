@@ -1,6 +1,6 @@
 package co.pragma.model.rol;
 
-import co.pragma.exception.RolNotFoundException;
+import co.pragma.exception.business.RolNotFoundException;
 import lombok.Getter;
 
 @Getter

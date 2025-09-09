@@ -1,7 +1,7 @@
 package co.pragma.api.config;
 
 import co.pragma.api.security.JwtService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,36 +10,42 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import java.util.List;
-
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter implements WebFilter {
 
     private final JwtService jwtService;
 
+    public JwtAuthenticationFilter(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        var authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+
+        if (authHeader == null || !authHeader.startsWith("Bearer "))
             return chain.filter(exchange);
-        }
 
-        var token = authHeader.substring(7);
-
+        String token = authHeader.substring(7);
         try {
-            var subject = jwtService.getUsernameFromToken(token);
+            var user = jwtService.getUsernameFromToken(token);
             var role = jwtService.getRoleFromToken(token);
+            var permisos = jwtService.getPermissionsFromToken(token);
 
-            var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
-            var auth = new UsernamePasswordAuthenticationToken(subject, "n/a", authorities);
+            Set<SimpleGrantedAuthority> authorities = permisos.stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toSet());
+            authorities.add(new SimpleGrantedAuthority(role));
 
-            return chain.filter(exchange)
-                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+            var auth = new UsernamePasswordAuthenticationToken(user, "n/a", authorities);
 
+            return chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
         } catch (Exception e) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
+
     }
 }

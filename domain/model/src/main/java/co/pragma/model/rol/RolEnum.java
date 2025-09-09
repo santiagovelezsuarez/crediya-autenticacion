@@ -7,9 +7,20 @@ import java.util.Set;
 
 @Getter
 public enum RolEnum {
-    ADMIN(1, "ADMIN", "Administrador del área financiera", Set.of(Permission.REGISTRAR_USUARIO)),
-    ASESOR(2, "ASESOR", "Asesor financiero de crediYa", Set.of(Permission.REGISTRAR_USUARIO)),
-    CLIENTE(3, "CLIENTE", "Cliente de crediYa", Set.of());
+    ADMIN(1, "ADMIN", "Administrador del área financiera", Set.of(
+            Permission.REGISTRAR_USUARIO
+    )),
+    ASESOR(2, "ASESOR", "Asesor financiero de crediYa", Set.of(
+            Permission.REGISTRAR_USUARIO,
+            Permission.APROBAR_SOLICITUD,
+            Permission.RECHAZAR_SOLICITUD
+    )),
+    CLIENTE(3, "CLIENTE", "Cliente de crediYa", Set.of(
+            Permission.SOLICITAR_PRESTAMO
+    )),
+    SISTEMA(4, "SISTEMA", "Sistema", Set.of(
+            Permission.VALIDAR_AUTOMATICO
+    ));
 
     private final Integer id;
     private final String nombre;
@@ -53,4 +64,7 @@ public enum RolEnum {
                 .build();
     }
 
+    public static Set<Permission> getPermissionsForRole(String roleName) {
+        return fromNombre(roleName).getPermissions();
+    }
 }

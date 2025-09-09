@@ -1,8 +1,8 @@
 package co.pragma.config.beans;
 
+import co.pragma.PermissionValidator;
 import co.pragma.api.security.SecurityContextSessionProvider;
 import co.pragma.model.usuario.gateways.SessionProvider;
-import co.pragma.model.rol.gateways.RolRepository;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
 import co.pragma.usecase.usuario.businessrules.UniqueDocumentoIdentidadValidator;
@@ -34,6 +34,11 @@ public class UserBeansConfig {
     @Bean
     public SessionProvider sessionProvider() {
         return new SecurityContextSessionProvider();
+    }
+
+    @Bean
+    public PermissionValidator permissionValidator(SessionProvider sessionProvider) {
+        return new PermissionValidator(sessionProvider);
     }
 }
 

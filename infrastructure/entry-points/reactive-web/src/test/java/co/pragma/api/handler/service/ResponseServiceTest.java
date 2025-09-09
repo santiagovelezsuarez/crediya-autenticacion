@@ -1,5 +1,6 @@
 package co.pragma.api.handler.service;
 
+import co.pragma.api.adapters.ResponseService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

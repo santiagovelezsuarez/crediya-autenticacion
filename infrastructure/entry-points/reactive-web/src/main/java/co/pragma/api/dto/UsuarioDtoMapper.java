@@ -2,6 +2,7 @@ package co.pragma.api.dto;
 
 import co.pragma.model.rol.Rol;
 import co.pragma.model.rol.RolEnum;
+import co.pragma.model.usuario.RegistrarUsuarioCommand;
 import co.pragma.model.usuario.TipoDocumento;
 import co.pragma.model.usuario.Usuario;
 import org.mapstruct.Mapper;
@@ -10,11 +11,14 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UsuarioDtoMapper {
 
+
+    RegistrarUsuarioCommand toCommand(RegistrarUsuarioDTO registrarUsuarioDTO);
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "tipoDocumento", expression = "java(mapTipoDocumento(dto.getTipoDocumento()))")
     @Mapping(target = "rol", expression = "java(mapRol(dto.getRol()))")
     @Mapping(target = "passwordHash", ignore = true)
-    Usuario toModel(RegistrarUsuarioDTO dto);
+    Usuario toDomain(RegistrarUsuarioDTO dto);
 
     @Mapping(target = "rol", expression = "java(usuario.getRol() != null ? usuario.getRol().getNombre() : null)")
     UsuarioResponse toResponse(Usuario usuario);

@@ -1,8 +1,10 @@
 package co.pragma.api.handler;
 
+import co.pragma.PermissionValidator;
+import co.pragma.api.adapters.ResponseService;
 import co.pragma.api.dto.*;
-import co.pragma.api.handler.service.ResponseService;
-import co.pragma.api.handler.service.UsuarioService;
+import co.pragma.model.rol.Permission;
+import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -10,20 +12,23 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class UsuarioHandler {
 
-    private final UsuarioService usuarioService;
+    private final RegistrarUsuarioUseCase registrarUsuarioUseCase;
     private final ResponseService responseService;
     private final UsuarioDtoMapper usuarioDtoMapper;
+    private final PermissionValidator permissionValidator;
 
     public Mono<ServerResponse> listenRegisterUser(ServerRequest serverRequest) {
         log.debug("Petición recibida para registrar usuario");
-        return serverRequest.bodyToMono(RegistrarUsuarioDTO.class)
-                .flatMap(usuarioService::registerUser)
+        return serverRequest
+                .bodyToMono(RegistrarUsuarioDTO.class)
+                .flatMap(dto -> permissionValidator.requirePermission(Permission.REGISTRAR_USUARIO).thenReturn(dto))
+                .map(usuarioDtoMapper::toCommand)
+                .flatMap(registrarUsuarioUseCase::execute)
                 .doOnNext(user -> log.trace("Usuario registrado con éxito: {}", user.getEmail()))
                 .map(usuarioDtoMapper::toResponse)
                 .flatMap(responseService::createdJson);

@@ -4,7 +4,6 @@ import co.pragma.api.handler.AuthHandler;
 import co.pragma.api.handler.UsuarioHandler;
 import co.pragma.api.RouterRest;
 import co.pragma.api.dto.UsuarioDtoMapper;
-import co.pragma.api.handler.service.UsuarioService;
 import co.pragma.api.security.JwtService;
 import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import org.junit.jupiter.api.Test;

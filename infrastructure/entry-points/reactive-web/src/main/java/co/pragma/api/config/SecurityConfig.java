@@ -33,7 +33,6 @@ public class SecurityConfig {
         return new org.springframework.web.cors.reactive.CorsWebFilter(source);
     }
 
-
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
@@ -43,7 +42,6 @@ public class SecurityConfig {
                         .pathMatchers("/api/health/**").permitAll()
                         .pathMatchers("/swagger-ui/**").permitAll()
                         .pathMatchers("/v3/api-docs/**").permitAll()
-                        .pathMatchers("/api/v1/usuarios/**").permitAll() // Temporarily allow get user without auth
                         .anyExchange().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtService), SecurityWebFiltersOrder.AUTHENTICATION)

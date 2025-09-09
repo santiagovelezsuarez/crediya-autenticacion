@@ -1,4 +1,4 @@
-package co.pragma;
+package co.pragma.model.usuario;
 
 import co.pragma.exception.business.ForbiddenException;
 import co.pragma.model.rol.Permission;

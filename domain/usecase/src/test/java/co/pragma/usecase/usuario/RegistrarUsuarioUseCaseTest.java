@@ -1,16 +1,20 @@
 package co.pragma.usecase.usuario;
 
-import co.pragma.exception.business.ForbiddenException;
+import co.pragma.error.ErrorCode;
+import co.pragma.exception.business.BusinessException;
+import co.pragma.exception.business.RolNotFoundException;
+import co.pragma.exception.business.SalarioBaseException;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.rol.RolEnum;
 import co.pragma.model.rol.gateways.RolRepository;
-import co.pragma.model.usuario.Session;
-import co.pragma.model.usuario.TipoDocumento;
+import co.pragma.model.usuario.RegistrarUsuarioCommand;
 import co.pragma.model.usuario.Usuario;
+import co.pragma.model.usuario.gateways.PasswordEncoderService;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
 import co.pragma.usecase.usuario.businessrules.UniqueDocumentoIdentidadValidator;
 import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,81 +23,89 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RegistrarUsuarioUseCaseTest {
 
     @Mock
-    private UsuarioRepository usuarioRepository;
-
-    @Mock
-    private SalarioRangeValidator salarioRangeValidator;
-
-    @Mock
-    private UniqueEmailValidator uniqueEmailValidator;
-
-    @Mock
-    private UniqueDocumentoIdentidadValidator uniqueDocumentoIdentidadValidator;
-
+    private UsuarioRepository userRepository;
     @Mock
     private RolRepository rolRepository;
-
     @Mock
-    private Session session;
+    private SalarioRangeValidator salarioRangeValidator;
+    @Mock
+    private UniqueEmailValidator uniqueEmailValidator;
+    @Mock
+    private UniqueDocumentoIdentidadValidator uniqueDocumentoIdentidadValidator;
+    @Mock
+    private PasswordEncoderService passwordEncoder;
 
     @InjectMocks
     private RegistrarUsuarioUseCase registrarUsuarioUseCase;
 
-    @Test
-    void shouldRegisterUserSuccessfully() {
-        Rol adminRol = Rol.builder().id(1).nombre("ADMIN").build();
+    private RegistrarUsuarioCommand command;
+    private Usuario usuario;
+    private Rol rol;
 
-        Usuario usuario = Usuario.builder()
-                .id(UUID.fromString("33ac0a47-79bd-4d78-8d08-c9c707cfa529"))
-                .nombres("Jhon Doe")
-                .apellidos("Doe")
-                .fechaNacimiento(LocalDate.of(1990, 1, 1))
-                .direccion("123 Main St")
-                .telefono("1234567890")
-                .email("jhondoe@example.co")
-                .salarioBase(BigDecimal.valueOf(3250000))
-                .tipoDocumento(TipoDocumento.CC)
-                .numeroDocumento("123456789")
-                .rol(adminRol) // rol inicial
+    @BeforeEach
+    void setUp() {
+        command = RegistrarUsuarioCommand.builder()
+                .nombres("Juan")
+                .apellidos("Perez")
+                .tipoDocumento("CC")
+                .numeroDocumento("1234567")
+                .email("juan.perez@example.com")
+                .rawPassword("12345678")
+                .rol("ASESOR")
+                .salarioBase(BigDecimal.valueOf(5000000))
                 .build();
 
-        when(uniqueEmailValidator.validate(usuario.getEmail())).thenReturn(Mono.empty());
-        when(salarioRangeValidator.validate(usuario.getSalarioBase())).thenReturn(Mono.empty());
-        when(uniqueDocumentoIdentidadValidator.validate(usuario.getTipoDocumento().name(), usuario.getNumeroDocumento())).thenReturn(Mono.empty());
-        when(rolRepository.findByNombre("ADMIN")).thenReturn(Mono.just(adminRol));
-        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
-        when(session.getRole()).thenReturn(RolEnum.ADMIN.getNombre());
-
-        StepVerifier.create(registrarUsuarioUseCase.execute(usuario, session))
-                .expectNextMatches(u -> u.getEmail().equals("jhondoe@example.co") &&
-                        u.getRol().getNombre().equals("ADMIN"))
-                .verifyComplete();
-
-        verify(usuarioRepository).save(any(Usuario.class));
+        rol = Rol.builder().nombre(RolEnum.ASESOR.getNombre()).build();
+        usuario = Usuario.builder().nombres("Juan").rol(rol).build();
     }
 
     @Test
-    void registerUserShouldFailWhenSessionNotAdmin() {
-        Usuario usuario = Usuario.builder()
-                .email("user@mail.com")
-                .salarioBase(BigDecimal.valueOf(1000))
-                .rol(Rol.builder().nombre(RolEnum.CLIENTE.getNombre()).build())
-                .build();
+    void shouldRegisterUserWhenAllRulesPass() {
+        when(salarioRangeValidator.validate(any())).thenReturn(Mono.empty());
+        when(uniqueEmailValidator.validate(any())).thenReturn(Mono.empty());
+        when(uniqueDocumentoIdentidadValidator.validate(any(), any())).thenReturn(Mono.empty());
+        when(passwordEncoder.encodeReactive(any())).thenReturn(Mono.just("hashedPassword"));
+        when(rolRepository.findByNombre(any())).thenReturn(Mono.just(rol));
+        when(userRepository.save(any(Usuario.class))).thenReturn(Mono.just(usuario));
 
-        when(session.getRole()).thenReturn(RolEnum.CLIENTE.getNombre());
+        StepVerifier.create(registrarUsuarioUseCase.execute(command))
+                .expectNextMatches(savedUser ->
+                        savedUser.getNombres().equals("Juan") &&
+                        savedUser.getRol().getNombre().equals("ASESOR")
+                )
+                .verifyComplete();
+    }
 
-        StepVerifier.create(registrarUsuarioUseCase.execute(usuario, session))
-                .expectError(ForbiddenException.class)
+    @Test
+    void shouldThrowBusinessExceptionWhenSalarioIsInvalid() {
+        when(salarioRangeValidator.validate(any())).thenReturn(Mono.error(new SalarioBaseException(ErrorCode.SALARIO_OUT_OF_RANGE)));
+
+        when(uniqueEmailValidator.validate(any())).thenReturn(Mono.empty());
+        when(uniqueDocumentoIdentidadValidator.validate(any(), any())).thenReturn(Mono.empty());
+        when(passwordEncoder.encodeReactive(any())).thenReturn(Mono.just("someHashedPassword"));
+
+        StepVerifier.create(registrarUsuarioUseCase.execute(command))
+                .expectErrorMatches(e -> e instanceof BusinessException && e.getMessage().equals(ErrorCode.SALARIO_OUT_OF_RANGE.getDefaultMessage()))
+                .verify();
+    }
+
+    @Test
+    void shouldThrowRolNotFoundExceptionWhenRolDoesNotExist() {
+        when(salarioRangeValidator.validate(any())).thenReturn(Mono.empty());
+        when(uniqueEmailValidator.validate(any())).thenReturn(Mono.empty());
+        when(uniqueDocumentoIdentidadValidator.validate(any(), any())).thenReturn(Mono.empty());
+        when(passwordEncoder.encodeReactive(any())).thenReturn(Mono.just("hashedPassword"));
+        when(rolRepository.findByNombre(any())).thenReturn(Mono.empty());
+
+        StepVerifier.create(registrarUsuarioUseCase.execute(command))
+                .expectError(RolNotFoundException.class)
                 .verify();
     }
 }

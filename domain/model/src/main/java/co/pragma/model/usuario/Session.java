@@ -18,7 +18,7 @@ public class Session {
     }
 
     public boolean isAuthenticated() {
-        return userId != null && !userId.equals("anonymous");
+        return userId != null && !userId.isEmpty();
     }
 
     public boolean hasRole(String role) {

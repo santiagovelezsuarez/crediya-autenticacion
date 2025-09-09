@@ -38,7 +38,7 @@ class UsuarioDtoMapperTest {
                 .password("password123")
                 .build();
 
-        Usuario usuario = mapper.toModel(dto);
+        Usuario usuario = mapper.toDomain(dto);
 
         assertThat(usuario).isNotNull();
         assertThat(usuario.getNombres()).isEqualTo(dto.getNombres());

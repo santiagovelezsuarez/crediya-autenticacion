@@ -11,7 +11,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UsuarioDtoMapper {
 
-
     RegistrarUsuarioCommand toCommand(RegistrarUsuarioDTO registrarUsuarioDTO);
 
     @Mapping(target = "id", ignore = true)

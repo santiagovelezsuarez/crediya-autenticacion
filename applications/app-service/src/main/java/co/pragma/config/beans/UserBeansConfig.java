@@ -1,6 +1,6 @@
 package co.pragma.config.beans;
 
-import co.pragma.PermissionValidator;
+import co.pragma.model.usuario.PermissionValidator;
 import co.pragma.api.security.SecurityContextSessionProvider;
 import co.pragma.model.usuario.gateways.SessionProvider;
 import co.pragma.model.usuario.gateways.UsuarioRepository;

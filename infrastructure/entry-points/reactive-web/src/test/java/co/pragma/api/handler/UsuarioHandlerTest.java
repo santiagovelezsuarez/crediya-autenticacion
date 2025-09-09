@@ -1,9 +1,12 @@
 package co.pragma.api.handler;
 
+import co.pragma.model.usuario.PermissionValidator;
 import co.pragma.api.adapters.ResponseService;
 import co.pragma.api.dto.RegistrarUsuarioDTO;
 import co.pragma.api.dto.UsuarioDtoMapper;
 import co.pragma.api.dto.UsuarioResponse;
+import co.pragma.model.rol.Permission;
+import co.pragma.model.usuario.RegistrarUsuarioCommand;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import org.junit.jupiter.api.Test;
@@ -15,14 +18,10 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UsuarioHandlerTest {
-
-    @Mock
-    private UsuarioService usuarioService;
 
     @Mock
     private RegistrarUsuarioUseCase registrarUsuarioUseCase;
@@ -33,20 +32,25 @@ class UsuarioHandlerTest {
     @Mock
     private UsuarioDtoMapper usuarioDtoMapper;
 
+    @Mock
+    private PermissionValidator permissionValidator;
+
     @InjectMocks
     private UsuarioHandler handler;
 
     @Test
     void shouldRegisterUser() {
-        RegistrarUsuarioDTO dto = new RegistrarUsuarioDTO();
-        Usuario usuario = new Usuario();
-        usuario.setEmail("test@example.com");
-        UsuarioResponse responseDto = UsuarioResponse.builder().email("test@example.com").build();
+        RegistrarUsuarioDTO requestDto = RegistrarUsuarioDTO.builder().email("test@mail.co").build();
+        RegistrarUsuarioCommand cmd = RegistrarUsuarioCommand.builder().email("test@mail.co").build();
+        Usuario usuario = Usuario.builder().email("test@mail.co").build();
+        UsuarioResponse responseDto = UsuarioResponse.builder().email("test@mail.co").build();
 
         ServerRequest request = mock(ServerRequest.class);
-        when(request.bodyToMono(RegistrarUsuarioDTO.class)).thenReturn(Mono.just(dto));
-        when(usuarioService.registerUser(dto)).thenReturn(Mono.just(usuario));
-        when(usuarioDtoMapper.toResponse(usuario)).thenReturn(responseDto);
+        when(request.bodyToMono(RegistrarUsuarioDTO.class)).thenReturn(Mono.just(requestDto));
+        when(permissionValidator.requirePermission(Permission.REGISTRAR_USUARIO)).thenReturn(Mono.empty());
+        when(usuarioDtoMapper.toCommand(any(RegistrarUsuarioDTO.class))).thenReturn(cmd);
+        when(registrarUsuarioUseCase.execute(cmd)).thenReturn(Mono.just(usuario));
+        when(usuarioDtoMapper.toResponse(any(Usuario.class))).thenReturn(responseDto);
         when(responseService.createdJson(responseDto)).thenReturn(Mono.just(mock(ServerResponse.class)));
 
         Mono<ServerResponse> result = handler.listenRegisterUser(request);
@@ -55,7 +59,7 @@ class UsuarioHandlerTest {
                 .expectNextCount(1)
                 .verifyComplete();
 
-        verify(usuarioService).registerUser(dto);
+        verify(registrarUsuarioUseCase).execute(cmd);
         verify(usuarioDtoMapper).toResponse(usuario);
         verify(responseService).createdJson(responseDto);
     }

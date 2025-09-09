@@ -1,14 +1,9 @@
 package co.pragma.usecase.usuario;
 
-import co.pragma.PermissionValidator;
-import co.pragma.exception.business.ForbiddenException;
 import co.pragma.exception.business.RolNotFoundException;
-import co.pragma.model.rol.Permission;
 import co.pragma.model.rol.Rol;
-import co.pragma.model.rol.RolEnum;
 import co.pragma.model.rol.gateways.RolRepository;
 import co.pragma.model.usuario.RegistrarUsuarioCommand;
-import co.pragma.model.usuario.Session;
 import co.pragma.model.usuario.TipoDocumento;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.PasswordEncoderService;

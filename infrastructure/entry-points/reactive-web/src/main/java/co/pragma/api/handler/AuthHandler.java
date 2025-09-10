@@ -1,8 +1,10 @@
 package co.pragma.api.handler;
 
+import co.pragma.api.adapters.ResponseService;
 import co.pragma.api.dto.*;
-import co.pragma.api.handler.service.ResponseService;
-import co.pragma.api.handler.service.UsuarioService;
+import co.pragma.api.security.JwtService;
+import co.pragma.model.usuario.Usuario;
+import co.pragma.usecase.usuario.AutenticarUsuarioUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,22 +17,23 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class AuthHandler {
 
-    private final UsuarioService usuarioService;
+    private final AutenticarUsuarioUseCase autenticarUsuarioUseCase;
+    private final JwtService jwtService;
     private final ResponseService responseService;
 
     public Mono<ServerResponse> listenAuthenticate(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(AutenticarUsuarioDTO.class)
-                .flatMap(usuarioService::authenticate)
-                .map(this::toLoginResponseDTO)
+                .flatMap(dto -> autenticarUsuarioUseCase.execute(dto.getEmail(), dto.getPassword()))
+                .map(usuario -> toLoginResponseDTO(usuario, jwtService.generateToken(usuario)))
                 .flatMap(responseService::okJson);
     }
 
-    private LoginResponseDTO toLoginResponseDTO(UsuarioService.AuthResult res) {
+    private LoginResponseDTO toLoginResponseDTO(Usuario usuario, String token) {
         return LoginResponseDTO.builder()
-                .userId(String.valueOf(res.usuario().getId()))
-                .email(res.usuario().getEmail())
-                .role(res.usuario().getRol().getNombre())
-                .token(res.token())
+                .userId(String.valueOf(usuario.getId()))
+                .email(usuario.getEmail())
+                .role(usuario.getRol().getNombre())
+                .token(token)
                 .build();
     }
 }

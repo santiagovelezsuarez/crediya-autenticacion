@@ -1,6 +1,6 @@
 package co.pragma.usecase.usuario.businesrules;
 
-import co.pragma.exception.DocumentoIdentidadAlreadyRegisteredException;
+import co.pragma.exception.business.DocumentoIdentidadAlreadyRegisteredException;
 import co.pragma.model.usuario.TipoDocumento;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;

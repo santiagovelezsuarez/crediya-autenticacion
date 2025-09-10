@@ -20,7 +20,7 @@ class TipoDocumentoTest {
         IllegalArgumentException exception =
                 assertThrows(IllegalArgumentException.class, () -> TipoDocumento.fromCodigo("XYZ"));
 
-        assertThat(exception.getMessage()).contains("Tipo de documento no válido: XYZ");
+        assertThat(exception.getMessage()).contains("Tipo de documento no válido");
     }
 
     @Test

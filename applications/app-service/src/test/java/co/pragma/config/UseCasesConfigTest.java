@@ -1,7 +1,10 @@
 package co.pragma.config;
 
+import co.pragma.model.rol.gateways.RolRepository;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
-import co.pragma.usecase.usuario.UsuarioUseCase;
+import co.pragma.usecase.usuario.AutenticarUsuarioUseCase;
+import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
+import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,8 +49,28 @@ class UseCasesConfigTest {
         }
 
         @Bean
-        public UsuarioUseCase usuarioUseCase() {
-            return Mockito.mock(UsuarioUseCase.class);
+        public RolRepository rolRepository() {
+            return Mockito.mock(RolRepository.class);
+        }
+
+        @Bean
+        public RegistrarUsuarioUseCase usuarioUseCase() {
+            return Mockito.mock(RegistrarUsuarioUseCase.class);
+        }
+
+        @Bean
+        public AutenticarUsuarioUseCase autenticarUsuarioUseCase() {
+            return  Mockito.mock(AutenticarUsuarioUseCase.class);
+        }
+
+        @Bean
+        public SalarioRangeValidator salarioRangeValidator() {
+            return Mockito.mock(SalarioRangeValidator.class);
+        }
+
+        @Bean
+        public RegistrarUsuarioUseCase registrarUsuarioUseCase() {
+            return  Mockito.mock(RegistrarUsuarioUseCase.class);
         }
     }
 

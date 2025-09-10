@@ -1,10 +1,9 @@
 package co.pragma.config.beans;
 
+import co.pragma.model.usuario.PermissionValidator;
 import co.pragma.api.security.SecurityContextSessionProvider;
-import co.pragma.model.rol.gateways.RolRepository;
 import co.pragma.model.usuario.gateways.SessionProvider;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
-import co.pragma.usecase.usuario.businessrules.RolResolver;
 import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
 import co.pragma.usecase.usuario.businessrules.UniqueDocumentoIdentidadValidator;
 import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
@@ -33,13 +32,13 @@ public class UserBeansConfig {
     }
 
     @Bean
-    public RolResolver rolResolver(RolRepository repository) {
-        return new RolResolver(repository);
+    public SessionProvider sessionProvider() {
+        return new SecurityContextSessionProvider();
     }
 
     @Bean
-    public SessionProvider sessionProvider() {
-        return new SecurityContextSessionProvider();
+    public PermissionValidator permissionValidator(SessionProvider sessionProvider) {
+        return new PermissionValidator(sessionProvider);
     }
 }
 

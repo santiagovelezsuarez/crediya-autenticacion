@@ -1,5 +1,7 @@
 package co.pragma.r2dbc.adapter;
 
+import co.pragma.error.ErrorCode;
+import co.pragma.exception.InfrastructureException;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.r2dbc.repository.UsuarioReactiveRepository;
@@ -24,8 +26,8 @@ public class UsuarioReactiveRepositoryAdapter implements UsuarioRepository {
         log.debug("Registrando usuario: {}", usuario);
         return usuarioRepository.save(mapper.toEntity(usuario))
                 .flatMap(this::mapToUsuario)
-                .doOnSuccess(u -> log.trace("Usuario registrado con éxito: {}", u))
-                .doOnError(e -> log.error("Error al registrar usuario: {}", e.getMessage()));
+                .doOnNext(u -> log.trace("Usuario registrado con éxito: {}", u.getEmail()))
+                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 
     @Override
@@ -33,8 +35,8 @@ public class UsuarioReactiveRepositoryAdapter implements UsuarioRepository {
         log.debug("Buscando usuario por email: {}", email);
         return usuarioRepository.findByEmail(email)
                 .flatMap(this::mapToUsuario)
-                .doOnNext(u -> log.trace("Usuario encontrado: {}", u))
-                .doOnError(e -> log.error("Error al buscar usuario con email {} : {}", email, e.getMessage()));
+                .doOnNext(u -> log.trace("findByEmail - Usuario encontrado: {}", u.getEmail()))
+                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 
     @Override
@@ -42,8 +44,8 @@ public class UsuarioReactiveRepositoryAdapter implements UsuarioRepository {
         log.debug("Buscando usuario por tipo y número de documento: {} {}", tipoDocumento, numeroDocumento);
         return usuarioRepository.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento)
                 .flatMap(this::mapToUsuario)
-                .doOnNext(u -> log.trace("Usuario encontrado: {}", u))
-                .doOnError(e -> log.error("Error al buscar usuario con tipoDocumento {} y numeroDocumento {} : {}", tipoDocumento, numeroDocumento, e.getMessage()));
+                .doOnNext(u -> log.trace("findByTipoDocumentoAndNumeroDocumento - Usuario encontrado: {}", u))
+                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 
     private Mono<Usuario> mapToUsuario(UsuarioEntity entity) {

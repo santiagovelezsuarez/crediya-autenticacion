@@ -1,4 +1,4 @@
-package co.pragma.api.handler.service;
+package co.pragma.api.adapters;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

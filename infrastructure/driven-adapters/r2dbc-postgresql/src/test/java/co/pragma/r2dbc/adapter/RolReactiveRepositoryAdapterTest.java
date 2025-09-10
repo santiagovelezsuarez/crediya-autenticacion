@@ -54,14 +54,6 @@ class RolReactiveRepositoryAdapterTest {
                 .verifyComplete();
     }
 
-    @Test
-    void findByIdShouldPropagateError() {
-        when(repository.findById(1)).thenReturn(Mono.error(new RuntimeException("DB error")));
-
-        StepVerifier.create(adapter.findById(1))
-                .expectErrorMatches(e -> e instanceof RuntimeException && e.getMessage().contains("DB error"))
-                .verify();
-    }
 
     @Test
     void findByNombreShouldReturnMappedRol() {

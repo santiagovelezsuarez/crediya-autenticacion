@@ -1,4 +1,4 @@
-package co.pragma.api.handler.service;
+package co.pragma.api.adapters;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

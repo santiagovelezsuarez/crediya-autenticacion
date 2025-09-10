@@ -1,5 +1,7 @@
 package co.pragma.r2dbc.adapter;
 
+import co.pragma.error.ErrorCode;
+import co.pragma.exception.InfrastructureException;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.usuario.TipoDocumento;
 import co.pragma.model.usuario.Usuario;
@@ -12,8 +14,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -29,12 +34,16 @@ class UsuarioReactiveRepositoryAdapterTest {
     @Mock
     UsuarioEntityMapper mapper;
 
+    @Mock
+    DatabaseClient databaseClient;
+
     @InjectMocks
     UsuarioReactiveRepositoryAdapter adapter;
 
     private UsuarioEntity entity;
     private Usuario usuario;
     private Rol rol;
+
 
     @BeforeEach
     void setUp() {
@@ -117,6 +126,19 @@ class UsuarioReactiveRepositoryAdapterTest {
 
         StepVerifier.create(result)
                 .expectErrorMatches(RuntimeException.class::isInstance)
+                .verify();
+    }
+
+    @Test
+    void shouldMapDbErrorToInfrastructureException() {
+        when(usuarioRepository.findByEmail(anyString())).thenReturn(Mono.error(new RuntimeException("bad SQL grammar")));
+
+        Mono<Usuario> result = adapter.findByEmail("user@mail.com");
+
+        StepVerifier.create(result).expectErrorSatisfies(error -> {
+                    assertThat(error).isInstanceOf(InfrastructureException.class);
+                    assertThat(error.getMessage()).isEqualTo(ErrorCode.DB_ERROR.name());
+                })
                 .verify();
     }
 }

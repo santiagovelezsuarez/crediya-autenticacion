@@ -21,8 +21,7 @@ public class SecurityConfig {
     @Bean
     public org.springframework.web.cors.reactive.CorsWebFilter corsFilter() {
         var config = new org.springframework.web.cors.CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:8081"); // microservicio
-        config.addAllowedOrigin("http://localhost:8080"); // swagger-ui
+        config.addAllowedOrigin("http://localhost:8080/swagger-ui");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);
@@ -33,7 +32,6 @@ public class SecurityConfig {
         return new org.springframework.web.cors.reactive.CorsWebFilter(source);
     }
 
-
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
@@ -43,7 +41,6 @@ public class SecurityConfig {
                         .pathMatchers("/api/health/**").permitAll()
                         .pathMatchers("/swagger-ui/**").permitAll()
                         .pathMatchers("/v3/api-docs/**").permitAll()
-                        .pathMatchers("/api/v1/usuarios/**").permitAll() // Temporarily allow get user without auth
                         .anyExchange().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtService), SecurityWebFiltersOrder.AUTHENTICATION)

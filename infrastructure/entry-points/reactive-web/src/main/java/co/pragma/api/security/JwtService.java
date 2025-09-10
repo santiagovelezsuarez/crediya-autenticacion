@@ -5,19 +5,24 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
+@Slf4j
 @Service
 public class JwtService {
 
-    private final long expiration;
     private final SecretKey key;
+    private final long expiration;
+
+    private static final String ROLE_CLAIM = "role";
+    private static final String EMAIL_CLAIM = "email";
+    private static final String USERID_CLAIM = "userId";
+    private static final String PERMISSIONS_CLAIM = "permissions";
 
     public JwtService(@Value("${security.jwt.secret-key}") String secret, @Value("${security.jwt.expiration-time}") long expiration) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
@@ -27,9 +32,12 @@ public class JwtService {
     public String generateToken(Usuario usuario) {
         Map<String, Object> claims = new HashMap<>();
 
-        claims.put("rol", usuario.getRol().getNombre());
-        claims.put("email", usuario.getEmail());
-        claims.put("userId", usuario.getId().toString());
+        claims.put(ROLE_CLAIM, usuario.getRol().getNombre());
+        claims.put(EMAIL_CLAIM, usuario.getEmail());
+        claims.put(USERID_CLAIM, usuario.getId().toString());
+        claims.put(PERMISSIONS_CLAIM, usuario.getRol().getPermissions());
+
+        log.debug("Generando token para el usuario {} with {} permissions", usuario.getEmail(), usuario.getRol().getPermissions().size());
 
         return createToken(claims, usuario.getEmail());
     }
@@ -62,8 +70,8 @@ public class JwtService {
 
     public Boolean validateToken(String token) {
         try {
-            final Date expiration = extractClaim(token, Claims::getExpiration);
-            return !expiration.before(new Date());
+            final Date expirationDate = extractClaim(token, Claims::getExpiration);
+            return !expirationDate.before(new Date());
         } catch (ExpiredJwtException e) {
             return false;
         }
@@ -74,6 +82,11 @@ public class JwtService {
     }
 
     public String getRoleFromToken(String token) {
-        return extractClaim(token, claims -> (String) claims.get("rol"));
+        return extractClaim(token, claims -> (String) claims.get(ROLE_CLAIM));
+    }
+
+    public Set<String> getPermissionsFromToken(String token) {
+        List<String> permissionsList = extractClaim(token,claims -> (List<String>) claims.get(PERMISSIONS_CLAIM));
+        return permissionsList != null ? new HashSet<>(permissionsList) : Set.of();
     }
 }

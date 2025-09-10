@@ -1,16 +1,28 @@
 package co.pragma.model.usuario;
 
-import lombok.AllArgsConstructor;
+import co.pragma.model.rol.Permission;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Set;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder(toBuilder = true)
+@Builder
 public class Session {
-    private String userId;
-    private String role;
+    private final String userId;
+    private final String role;
+    private final String email;
+    private final Set<String> permissions;
+
+    public boolean hasPermission(Permission permission) {
+        return permissions != null && permissions.contains(permission.name());
+    }
+
+    public boolean isAuthenticated() {
+        return userId != null && !userId.isEmpty();
+    }
+
+    public boolean hasRole(String role) {
+        return this.role != null && this.role.equalsIgnoreCase(role);
+    }
 }
 

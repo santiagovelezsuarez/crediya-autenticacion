@@ -10,8 +10,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 public class JwtAuthenticationFilter implements WebFilter {
 
@@ -34,11 +33,11 @@ public class JwtAuthenticationFilter implements WebFilter {
             var role = jwtService.getRoleFromToken(token);
             var permisos = jwtService.getPermissionsFromToken(token);
 
-            Set<SimpleGrantedAuthority> authorities = permisos.stream()
+            var authorities = new ArrayList<SimpleGrantedAuthority>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+            authorities.addAll(permisos.stream()
                     .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toSet());
-            authorities.add(new SimpleGrantedAuthority(role));
-
+                    .toList());
             var auth = new UsernamePasswordAuthenticationToken(user, "n/a", authorities);
 
             return chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
@@ -46,6 +45,5 @@ public class JwtAuthenticationFilter implements WebFilter {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
-
     }
 }

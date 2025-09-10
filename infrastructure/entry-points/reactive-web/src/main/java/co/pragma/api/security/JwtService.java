@@ -16,8 +16,8 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private final long expiration;
     private final SecretKey key;
+    private final long expiration;
 
     private static final String ROLE_CLAIM = "role";
     private static final String EMAIL_CLAIM = "email";

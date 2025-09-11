@@ -1,5 +1,7 @@
 package co.pragma.api.dto;
 
+import co.pragma.api.dto.request.RegistrarUsuarioDTO;
+import co.pragma.api.dto.response.UsuarioResponse;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.rol.RolEnum;
 import co.pragma.model.usuario.TipoDocumento;

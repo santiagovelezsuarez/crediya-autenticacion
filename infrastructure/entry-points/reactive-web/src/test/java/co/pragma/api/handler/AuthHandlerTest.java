@@ -1,8 +1,8 @@
 package co.pragma.api.handler;
 
 import co.pragma.api.adapters.ResponseService;
-import co.pragma.api.dto.AutenticarUsuarioDTO;
-import co.pragma.api.dto.LoginResponseDTO;
+import co.pragma.api.dto.request.AutenticarUsuarioDTO;
+import co.pragma.api.dto.response.LoginResponseDTO;
 import co.pragma.api.security.JwtService;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.usuario.Usuario;

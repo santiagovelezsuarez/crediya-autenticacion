@@ -4,6 +4,7 @@ import co.pragma.api.handler.AuthHandler;
 import co.pragma.api.handler.UsuarioHandler;
 import co.pragma.api.RouterRest;
 import co.pragma.api.dto.UsuarioDtoMapper;
+import co.pragma.api.handler.UsuarioQueryHandler;
 import co.pragma.api.security.JwtService;
 import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,9 @@ class ConfigTest {
     private UsuarioHandler usuarioHandler;
 
     @MockitoBean
+    private UsuarioQueryHandler usuarioQueryHandler;
+
+    @MockitoBean
     private AuthHandler authHandler;
 
     @MockitoBean
@@ -43,8 +47,7 @@ class ConfigTest {
                 .uri("/api/health")
                 .exchange()
                 .expectStatus().isOk()
-                .expectHeader().valueEquals("Content-Security-Policy",
-                        "default-src 'self'; frame-ancestors 'self'; form-action 'self'")
+                .expectHeader().valueEquals("Content-Security-Policy", "default-src 'self'; frame-ancestors 'self'; form-action 'self'")
                 .expectHeader().valueEquals("Strict-Transport-Security", "max-age=31536000;")
                 .expectHeader().valueEquals("X-Content-Type-Options", "nosniff")
                 .expectHeader().valueEquals("Server", "Netty")

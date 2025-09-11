@@ -1,5 +1,6 @@
 package co.pragma.api.dto;
 
+import co.pragma.api.dto.request.RegistrarUsuarioDTO;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

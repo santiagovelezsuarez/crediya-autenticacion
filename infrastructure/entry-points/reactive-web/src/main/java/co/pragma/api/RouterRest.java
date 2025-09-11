@@ -1,8 +1,13 @@
 package co.pragma.api;
 
-import co.pragma.api.dto.*;
+import co.pragma.api.dto.request.AutenticarUsuarioDTO;
+import co.pragma.api.dto.request.RegistrarUsuarioDTO;
+import co.pragma.api.dto.response.ErrorResponse;
+import co.pragma.api.dto.response.LoginResponseDTO;
+import co.pragma.api.dto.response.UsuarioResponse;
 import co.pragma.api.handler.AuthHandler;
 import co.pragma.api.handler.UsuarioHandler;
+import co.pragma.api.handler.UsuarioQueryHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -110,6 +115,11 @@ public class RouterRest {
     })
     public RouterFunction<ServerResponse> authRoutes(AuthHandler handler) {
         return route(POST("/api/v1/login"), handler::listenAuthenticate);
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> userQueryRoutes(UsuarioQueryHandler handler) {
+        return route(POST("/api/v1/usuarios/batch"), handler::listenGetUsuariosBatch);
     }
 
     @Bean

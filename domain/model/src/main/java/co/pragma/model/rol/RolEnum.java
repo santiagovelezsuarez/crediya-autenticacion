@@ -13,7 +13,8 @@ public enum RolEnum {
     ASESOR(2, "ASESOR", "Asesor financiero de crediYa", Set.of(
             Permission.REGISTRAR_USUARIO,
             Permission.APROBAR_SOLICITUD,
-            Permission.RECHAZAR_SOLICITUD
+            Permission.RECHAZAR_SOLICITUD,
+            Permission.LISTAR_SOLICITUDES_PENDIENTES
     )),
     CLIENTE(3, "CLIENTE", "Cliente de crediYa", Set.of(
             Permission.SOLICITAR_PRESTAMO

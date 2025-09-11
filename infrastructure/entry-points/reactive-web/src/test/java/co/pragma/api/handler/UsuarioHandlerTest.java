@@ -2,9 +2,9 @@ package co.pragma.api.handler;
 
 import co.pragma.model.usuario.PermissionValidator;
 import co.pragma.api.adapters.ResponseService;
-import co.pragma.api.dto.RegistrarUsuarioDTO;
+import co.pragma.api.dto.request.RegistrarUsuarioDTO;
 import co.pragma.api.dto.UsuarioDtoMapper;
-import co.pragma.api.dto.UsuarioResponse;
+import co.pragma.api.dto.response.UsuarioResponse;
 import co.pragma.model.rol.Permission;
 import co.pragma.model.usuario.RegistrarUsuarioCommand;
 import co.pragma.model.usuario.Usuario;

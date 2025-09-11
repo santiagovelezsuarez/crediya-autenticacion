@@ -9,23 +9,34 @@ import org.springframework.stereotype.Component;
 @Component
 public class UsuarioEntityMapper {
 
-    public Usuario toDomain(UsuarioEntity entity, Rol rol) {
-        if (entity == null) {
-            return null;
-        }
-
+    public Usuario toDomain(UsuarioEntity usuarioEntity) {
         return Usuario.builder()
-                .id(entity.getId())
-                .nombres(entity.getNombres())
-                .apellidos(entity.getApellidos())
-                .tipoDocumento(TipoDocumento.fromCodigo(entity.getTipoDocumento()))
-                .numeroDocumento(entity.getNumeroDocumento())
-                .fechaNacimiento(entity.getFechaNacimiento())
-                .direccion(entity.getDireccion())
-                .telefono(entity.getTelefono())
-                .email(entity.getEmail())
-                .passwordHash(entity.getPasswordHash())
-                .salarioBase(entity.getSalarioBase())
+                .id(usuarioEntity.getId())
+                .email(usuarioEntity.getEmail())
+                .nombres(usuarioEntity.getNombres())
+                .apellidos(usuarioEntity.getApellidos())
+                .salarioBase(usuarioEntity.getSalarioBase())
+                .fechaNacimiento(usuarioEntity.getFechaNacimiento())
+                .numeroDocumento(usuarioEntity.getNumeroDocumento())
+                .direccion(usuarioEntity.getDireccion())
+                .telefono(usuarioEntity.getTelefono())
+                .tipoDocumento(TipoDocumento.valueOf(usuarioEntity.getTipoDocumento()))
+                .build();
+    }
+
+    public Usuario toDomainWithRole(UsuarioEntity usuarioEntity, Rol rol) {
+        return Usuario.builder()
+                .id(usuarioEntity.getId())
+                .nombres(usuarioEntity.getNombres())
+                .apellidos(usuarioEntity.getApellidos())
+                .tipoDocumento(TipoDocumento.fromCodigo(usuarioEntity.getTipoDocumento()))
+                .numeroDocumento(usuarioEntity.getNumeroDocumento())
+                .fechaNacimiento(usuarioEntity.getFechaNacimiento())
+                .direccion(usuarioEntity.getDireccion())
+                .telefono(usuarioEntity.getTelefono())
+                .email(usuarioEntity.getEmail())
+                .passwordHash(usuarioEntity.getPasswordHash())
+                .salarioBase(usuarioEntity.getSalarioBase())
                 .rol(rol)
                 .build();
     }

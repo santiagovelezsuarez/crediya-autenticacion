@@ -10,9 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryAuthorizationException;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
@@ -32,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
-class GlobalExceptionHandlerUnitTest {
+class GlobalExceptionHandlerTest {
 
     @Mock
     private ErrorAttributes errorAttributes;
@@ -65,15 +63,14 @@ class GlobalExceptionHandlerUnitTest {
     @Test
     void shouldHandleSalarioOutOfRange() {
         var ex = new SalarioBaseException(ErrorCode.SALARIO_OUT_OF_RANGE);
-        var serverRequest = Mockito.mock(ServerRequest.class);
 
-        when(errorAttributes.getError(serverRequest)).thenReturn(ex);
+        when(errorAttributes.getError(request)).thenReturn(ex);
         when(errorCodeHttpMapper.toHttpStatus(ErrorCode.SALARIO_OUT_OF_RANGE)).thenReturn(HttpStatus.UNPROCESSABLE_ENTITY);
 
         Mono<ServerResponse> responseMono = Objects.requireNonNull(handler.getRoutingFunction(errorAttributes)
-                        .route(serverRequest)
+                        .route(request)
                         .block())
-                .handle(serverRequest);
+                .handle(request);
 
         StepVerifier.create(responseMono)
                 .assertNext(response -> assertThat(response.statusCode())
@@ -86,14 +83,13 @@ class GlobalExceptionHandlerUnitTest {
         DtoValidationException.FieldError fieldError = new DtoValidationException.FieldError("email", "El campo email debe ser una dirección de correo electrónico válida");
         List<DtoValidationException.FieldError> errors = List.of(fieldError);
         var ex = new DtoValidationException(errors);
-        var serverRequest = Mockito.mock(ServerRequest.class);
 
-        when(errorAttributes.getError(serverRequest)).thenReturn(ex);
+        when(errorAttributes.getError(request)).thenReturn(ex);
 
         Mono<ServerResponse> responseMono = Objects.requireNonNull(handler.getRoutingFunction(errorAttributes)
-                        .route(serverRequest)
+                        .route(request)
                         .block())
-                .handle(serverRequest);
+                .handle(request);
 
         StepVerifier.create(responseMono)
                 .assertNext(response -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST))
@@ -103,14 +99,13 @@ class GlobalExceptionHandlerUnitTest {
     @Test
     void shouldHandleInfrastructureException() {
         var ex = new InfrastructureException("DB_ERROR", new RuntimeException("Connection failed"));
-        var serverRequest = Mockito.mock(ServerRequest.class);
 
-        when(errorAttributes.getError(serverRequest)).thenReturn(ex);
+        when(errorAttributes.getError(request)).thenReturn(ex);
 
         Mono<ServerResponse> responseMono = Objects.requireNonNull(handler.getRoutingFunction(errorAttributes)
-                        .route(serverRequest)
+                        .route(request)
                         .block())
-                .handle(serverRequest);
+                .handle(request);
 
         StepVerifier.create(responseMono)
                 .assertNext(response -> assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR))

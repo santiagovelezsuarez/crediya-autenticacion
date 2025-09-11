@@ -1,5 +1,8 @@
 package co.pragma.api.dto;
 
+import co.pragma.api.dto.request.RegistrarUsuarioDTO;
+import co.pragma.api.dto.response.UsuarioInfoDTO;
+import co.pragma.api.dto.response.UsuarioResponse;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.rol.RolEnum;
 import co.pragma.model.usuario.RegistrarUsuarioCommand;
@@ -7,6 +10,8 @@ import co.pragma.model.usuario.TipoDocumento;
 import co.pragma.model.usuario.Usuario;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UsuarioDtoMapper {
@@ -21,6 +26,12 @@ public interface UsuarioDtoMapper {
 
     @Mapping(target = "rol", expression = "java(usuario.getRol() != null ? usuario.getRol().getNombre() : null)")
     UsuarioResponse toResponse(Usuario usuario);
+
+    @Mapping(target = "nombre", expression = "java(usuario.getNombres() + ' ' + usuario.getApellidos())")
+    UsuarioInfoDTO toUsuarioInfoDTO(Usuario usuario);
+
+    @Mapping(target = "nombre", expression = "java(usuario.getNombres() + ' ' + usuario.getApellidos())")
+    List<UsuarioInfoDTO> toUsuarioInfoDtoList(List<Usuario> usuarios);
 
     default TipoDocumento mapTipoDocumento(String codigo) {
         return TipoDocumento.fromCodigo(codigo);

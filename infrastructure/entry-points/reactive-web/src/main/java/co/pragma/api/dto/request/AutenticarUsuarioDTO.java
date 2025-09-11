@@ -1,4 +1,4 @@
-package co.pragma.api.dto;
+package co.pragma.api.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

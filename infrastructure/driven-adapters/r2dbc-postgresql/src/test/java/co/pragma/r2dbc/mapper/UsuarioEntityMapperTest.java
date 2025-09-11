@@ -21,7 +21,7 @@ class UsuarioEntityMapperTest {
     }
 
     @Test
-    void toDomainShouldMapAllFields() {
+    void toDomainWithRoleShouldMapAllFields() {
         UUID id = UUID.randomUUID();
         Rol rol = new Rol(1, "ADMIN", "Administrador");
 
@@ -39,7 +39,7 @@ class UsuarioEntityMapperTest {
                 .salarioBase(BigDecimal.valueOf(5000))
                 .build();
 
-        Usuario usuario = mapper.toDomain(entity, rol);
+        Usuario usuario = mapper.toDomainWithRole(entity, rol);
 
         assertThat(usuario).isNotNull();
         assertThat(usuario.getId()).isEqualTo(id);
@@ -57,9 +57,35 @@ class UsuarioEntityMapperTest {
     }
 
     @Test
-    void toDomainShouldReturnNullWhenEntityIsNull() {
-        Usuario usuario = mapper.toDomain(null, new Rol(1, "ADMIN", "Administrador"));
-        assertThat(usuario).isNull();
+    void toDomainShouldMapAllFields() {
+        UUID id = UUID.randomUUID();
+
+        UsuarioEntity entity = UsuarioEntity.builder()
+                .id(id)
+                .nombres("John")
+                .apellidos("Doe")
+                .tipoDocumento("CC")
+                .numeroDocumento("123456")
+                .fechaNacimiento(LocalDate.of(1990, 1, 1))
+                .direccion("Street 123")
+                .telefono("555-1234")
+                .email("john.doe@mail.com")
+                .salarioBase(BigDecimal.valueOf(5000))
+                .build();
+
+        Usuario usuario = mapper.toDomain(entity);
+
+        assertThat(usuario).isNotNull();
+        assertThat(usuario.getId()).isEqualTo(id);
+        assertThat(usuario.getNombres()).isEqualTo("John");
+        assertThat(usuario.getApellidos()).isEqualTo("Doe");
+        assertThat(usuario.getTipoDocumento()).isEqualTo(TipoDocumento.CC);
+        assertThat(usuario.getNumeroDocumento()).isEqualTo("123456");
+        assertThat(usuario.getFechaNacimiento()).isEqualTo(LocalDate.of(1990, 1, 1));
+        assertThat(usuario.getDireccion()).isEqualTo("Street 123");
+        assertThat(usuario.getTelefono()).isEqualTo("555-1234");
+        assertThat(usuario.getEmail()).isEqualTo("john.doe@mail.com");
+        assertThat(usuario.getSalarioBase()).isEqualByComparingTo(BigDecimal.valueOf(5000));
     }
 
     @Test

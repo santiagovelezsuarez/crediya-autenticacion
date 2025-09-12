@@ -1,0 +1,18 @@
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+adapters:
+  r2dbc:
+    host: postgres-auth
+    port: 5432
+    database: ${DB_NAME:crediya_autenticacion}
+    username: ${DB_USER:crediya_user}
+    password: ${DB_PASSWORD:crediya_secure_password_123}
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    co.pragma: DEBUG

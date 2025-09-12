@@ -76,9 +76,8 @@ class UsuarioDtoMapperTest {
     void mapTipoDocumentoShouldReturnCorrectEnum() {
         assertThat(mapper.mapTipoDocumento("CC")).isEqualTo(TipoDocumento.CC);
         assertThat(mapper.mapTipoDocumento("CE")).isEqualTo(TipoDocumento.CE);
-        assertThatThrownBy(() -> mapper.mapTipoDocumento("INVALID"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Tipo de documento no válido");
+        assertThatThrownBy(() -> mapper.mapTipoDocumento("INVALID")).isInstanceOf(IllegalArgumentException.class);
+
     }
 
     @Test

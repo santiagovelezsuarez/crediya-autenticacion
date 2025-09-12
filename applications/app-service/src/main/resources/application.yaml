@@ -1,21 +1,18 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
   servlet:
     encoding:
       enabled: true
       charset: "UTF-8"
       force: true
+
 spring:
   application:
     name: "crediya-autenticacion"
-  devtools:
-    add-properties: false
-  h2:
-    console:
-      enabled: true
-      path: "/h2"
-  profiles:
-    include: null
+
+cors:
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
+
 management:
   endpoints:
     web:
@@ -29,20 +26,16 @@ management:
 security:
   jwt:
     secret-key: ${JWT_SECRET_KEY:8d0ec032515e2e10331c05c99086f2a117ab8c23cd19ec71209cf77354c38870}
-    expiration-time: ${JWT_EXPIRATION:86400}
-    issuer: ${JWT_ISSUER:crediya-autenticacion}
-
-cors:
-  allowed-origins: "http://localhost:4200,http://localhost:8080"
+    expiration-time: ${JWT_EXPIRATION:3600000}
 
 adapters:
   r2dbc:
-    host: "192.168.1.100"
-    port: 5432
-    database: "crediya_autenticacion"
-    schema: "public"
-    username: "santi"
-    password: "1926"
+    host: ${DB_HOST:localhost}
+    port: ${DB_PORT:5432}
+    database: ${DB_NAME:crediya_autenticacion}
+    schema: public
+    username: ${DB_USER:user}
+    password: ${DB_PASSWORD:pass}
 
 validation:
   salary:

@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    active: local
+
+adapters:
+  r2dbc:
+    host: 192.168.1.100
+    port: 5432
+    database: crediya_autenticacion
+    schema: public
+    username: santi
+    password: 1926

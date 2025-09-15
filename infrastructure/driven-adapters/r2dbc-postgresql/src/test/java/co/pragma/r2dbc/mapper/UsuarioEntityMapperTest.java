@@ -142,9 +142,4 @@ class UsuarioEntityMapperTest {
         assertThat(entity.getIdRol()).isNull();
     }
 
-    @Test
-    void toEntityShouldReturnNullWhenUsuarioIsNull() {
-        UsuarioEntity entity = mapper.toEntity(null);
-        assertThat(entity).isNull();
-    }
 }

@@ -1,6 +1,6 @@
 package co.pragma.model.usuario.gateways;
 
-import co.pragma.model.usuario.Session;
+import co.pragma.model.session.Session;
 import reactor.core.publisher.Mono;
 
 public interface SessionProvider {

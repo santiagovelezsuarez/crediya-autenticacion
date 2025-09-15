@@ -1,6 +1,6 @@
 package co.pragma.usecase.usuario.businessrules;
 
-import co.pragma.error.ErrorCode;
+import co.pragma.exception.ErrorCode;
 import co.pragma.exception.business.SalarioBaseException;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;

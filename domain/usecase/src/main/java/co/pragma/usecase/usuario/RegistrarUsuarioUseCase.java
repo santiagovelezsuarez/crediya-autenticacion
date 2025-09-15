@@ -3,7 +3,7 @@ package co.pragma.usecase.usuario;
 import co.pragma.exception.business.RolNotFoundException;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.rol.gateways.RolRepository;
-import co.pragma.model.usuario.RegistrarUsuarioCommand;
+import co.pragma.model.usuario.command.RegistrarUsuarioCommand;
 import co.pragma.model.usuario.TipoDocumento;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.PasswordEncoderService;
@@ -38,6 +38,9 @@ public class RegistrarUsuarioUseCase {
                         .apellidos(cmd.apellidos())
                         .tipoDocumento(TipoDocumento.fromCodigo(cmd.tipoDocumento()))
                         .numeroDocumento(cmd.numeroDocumento())
+                        .fechaNacimiento(cmd.fechaNacimiento())
+                        .direccion(cmd.direccion())
+                        .telefono(cmd.telefono())
                         .email(cmd.email())
                         .passwordHash(hash)
                         .salarioBase(cmd.salarioBase())

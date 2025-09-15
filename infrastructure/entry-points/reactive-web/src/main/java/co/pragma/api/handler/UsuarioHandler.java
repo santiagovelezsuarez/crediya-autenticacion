@@ -1,10 +1,11 @@
 package co.pragma.api.handler;
 
 import co.pragma.api.dto.request.RegistrarUsuarioDTO;
-import co.pragma.model.usuario.PermissionValidator;
+import co.pragma.api.mapper.UsuarioDtoMapper;
+import co.pragma.model.session.PermissionValidator;
 import co.pragma.api.adapters.ResponseService;
 import co.pragma.api.dto.*;
-import co.pragma.model.rol.Permission;
+import co.pragma.model.session.Permission;
 import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

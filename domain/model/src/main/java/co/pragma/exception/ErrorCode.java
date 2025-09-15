@@ -1,4 +1,4 @@
-package co.pragma.error;
+package co.pragma.exception;
 
 public enum ErrorCode {
     EMAIL_ALREADY_REGISTERED("El correo electrónico ya está registrado."),

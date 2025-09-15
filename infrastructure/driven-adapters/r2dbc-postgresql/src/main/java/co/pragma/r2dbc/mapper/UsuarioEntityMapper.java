@@ -12,15 +12,16 @@ public class UsuarioEntityMapper {
     public Usuario toDomain(UsuarioEntity usuarioEntity) {
         return Usuario.builder()
                 .id(usuarioEntity.getId())
-                .email(usuarioEntity.getEmail())
                 .nombres(usuarioEntity.getNombres())
                 .apellidos(usuarioEntity.getApellidos())
-                .salarioBase(usuarioEntity.getSalarioBase())
-                .fechaNacimiento(usuarioEntity.getFechaNacimiento())
+                .tipoDocumento(TipoDocumento.valueOf(usuarioEntity.getTipoDocumento()))
                 .numeroDocumento(usuarioEntity.getNumeroDocumento())
+                .fechaNacimiento(usuarioEntity.getFechaNacimiento())
                 .direccion(usuarioEntity.getDireccion())
                 .telefono(usuarioEntity.getTelefono())
-                .tipoDocumento(TipoDocumento.valueOf(usuarioEntity.getTipoDocumento()))
+                .email(usuarioEntity.getEmail())
+                .passwordHash(usuarioEntity.getPasswordHash())
+                .salarioBase(usuarioEntity.getSalarioBase())
                 .build();
     }
 
@@ -42,10 +43,6 @@ public class UsuarioEntityMapper {
     }
 
     public UsuarioEntity toEntity(Usuario usuario) {
-        if (usuario == null) {
-            return null;
-        }
-
         return UsuarioEntity.builder()
                 .id(usuario.getId())
                 .nombres(usuario.getNombres())

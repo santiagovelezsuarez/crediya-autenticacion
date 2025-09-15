@@ -1,6 +1,6 @@
 package co.pragma.api.security;
 
-import co.pragma.model.rol.Permission;
+import co.pragma.model.session.Permission;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.usuario.Usuario;
 import org.junit.jupiter.api.BeforeEach;

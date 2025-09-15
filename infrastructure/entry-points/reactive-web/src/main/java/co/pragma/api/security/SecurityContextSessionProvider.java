@@ -1,6 +1,6 @@
 package co.pragma.api.security;
 
-import co.pragma.model.usuario.Session;
+import co.pragma.model.session.Session;
 import co.pragma.model.usuario.gateways.SessionProvider;
 import reactor.core.publisher.Mono;
 

@@ -1,9 +1,9 @@
 package co.pragma.api.security;
 
 import co.pragma.exception.business.ForbiddenException;
-import co.pragma.model.rol.Permission;
+import co.pragma.model.session.Permission;
 import co.pragma.model.rol.RolEnum;
-import co.pragma.model.usuario.Session;
+import co.pragma.model.session.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;

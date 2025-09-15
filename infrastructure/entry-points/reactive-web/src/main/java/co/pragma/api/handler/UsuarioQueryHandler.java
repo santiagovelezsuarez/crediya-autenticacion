@@ -2,12 +2,12 @@ package co.pragma.api.handler;
 
 import co.pragma.api.adapters.ResponseService;
 import co.pragma.api.dto.DtoValidator;
-import co.pragma.api.dto.UsuarioDtoMapper;
+import co.pragma.api.mapper.UsuarioDtoMapper;
 import co.pragma.api.dto.request.GetUsuariosBatchDTO;
 import co.pragma.api.dto.response.UsuarioInfoListResponse;
 import co.pragma.exception.business.UsuarioNotFoundException;
-import co.pragma.model.rol.Permission;
-import co.pragma.model.usuario.PermissionValidator;
+import co.pragma.model.session.Permission;
+import co.pragma.model.session.PermissionValidator;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.usecase.usuario.ConsultarUsuariosBatchUseCase;
 import lombok.RequiredArgsConstructor;

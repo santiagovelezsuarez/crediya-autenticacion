@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 public class UsuarioHandler {
 
     private final RegistrarUsuarioUseCase registrarUsuarioUseCase;
+    private final DtoValidator dtoValidator;
     private final ResponseService responseService;
     private final UsuarioDtoMapper usuarioDtoMapper;
     private final PermissionValidator permissionValidator;
@@ -27,6 +28,7 @@ public class UsuarioHandler {
         log.debug("Petición recibida para registrar usuario");
         return serverRequest
                 .bodyToMono(RegistrarUsuarioDTO.class)
+                .flatMap(dtoValidator::validate)
                 .flatMap(dto -> permissionValidator.requirePermission(Permission.REGISTRAR_USUARIO).thenReturn(dto))
                 .map(usuarioDtoMapper::toCommand)
                 .flatMap(registrarUsuarioUseCase::execute)

@@ -1,13 +1,13 @@
 package co.pragma.api.handler;
 
 import co.pragma.api.adapters.ResponseService;
+import co.pragma.api.dto.DtoValidator;
 import co.pragma.api.dto.UsuarioDtoMapper;
 import co.pragma.api.dto.request.GetUsuariosBatchDTO;
 import co.pragma.api.dto.response.UsuarioInfoListResponse;
 import co.pragma.exception.business.UsuarioNotFoundException;
 import co.pragma.model.rol.Permission;
 import co.pragma.model.usuario.PermissionValidator;
-import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.usecase.usuario.ConsultarUsuariosBatchUseCase;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +24,7 @@ import java.util.UUID;
 public class UsuarioQueryHandler {
 
     private final ConsultarUsuariosBatchUseCase consultarUsuariosBatchUseCase;
+    private final DtoValidator dtoValidator;
     private final UsuarioRepository usuarioRepository;
     private final PermissionValidator permissionValidator;
     private final UsuarioDtoMapper usuarioDtoMapper;
@@ -33,6 +34,7 @@ public class UsuarioQueryHandler {
         log.debug("Petición recibida para consulta batch de usuarios");
         return serverRequest
                 .bodyToMono(GetUsuariosBatchDTO.class)
+                .flatMap(dtoValidator::validate)
                 .flatMap(list -> permissionValidator.requirePermission(Permission.LISTAR_SOLICITUDES_PENDIENTES).thenReturn(list))
                 .doOnNext(userIds -> log.trace("Consultando {} usuarios: {}", userIds.getUserIds().size(), userIds))
                 .flatMapMany(dto -> consultarUsuariosBatchUseCase.execute(dto.getUserIds()))

@@ -1,7 +1,6 @@
-package co.pragma.model.usuario;
+package co.pragma.model.session;
 
 import co.pragma.exception.business.ForbiddenException;
-import co.pragma.model.rol.Permission;
 import co.pragma.model.usuario.gateways.SessionProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

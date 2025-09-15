@@ -1,6 +1,5 @@
-package co.pragma.model.usuario;
+package co.pragma.model.session;
 
-import co.pragma.model.rol.Permission;
 import co.pragma.model.rol.RolEnum;
 import org.junit.jupiter.api.Test;
 

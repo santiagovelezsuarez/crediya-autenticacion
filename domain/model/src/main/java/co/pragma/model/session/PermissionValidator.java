@@ -1,7 +1,6 @@
-package co.pragma.model.usuario;
+package co.pragma.model.session;
 
 import co.pragma.exception.business.ForbiddenException;
-import co.pragma.model.rol.Permission;
 import co.pragma.model.usuario.gateways.SessionProvider;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;

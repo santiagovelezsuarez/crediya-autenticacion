@@ -1,13 +1,13 @@
 package co.pragma.usecase.usuario;
 
-import co.pragma.error.ErrorCode;
+import co.pragma.exception.ErrorCode;
 import co.pragma.exception.business.BusinessException;
 import co.pragma.exception.business.RolNotFoundException;
 import co.pragma.exception.business.SalarioBaseException;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.rol.RolEnum;
 import co.pragma.model.rol.gateways.RolRepository;
-import co.pragma.model.usuario.RegistrarUsuarioCommand;
+import co.pragma.model.usuario.command.RegistrarUsuarioCommand;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.PasswordEncoderService;
 import co.pragma.model.usuario.gateways.UsuarioRepository;

@@ -1,4 +1,4 @@
-package co.pragma.model.rol;
+package co.pragma.model.session;
 
 public enum Permission {
     REGISTRAR_USUARIO,

@@ -1,12 +1,13 @@
 package co.pragma.api.handler;
 
-import co.pragma.model.usuario.PermissionValidator;
+import co.pragma.api.dto.DtoValidator;
+import co.pragma.model.session.PermissionValidator;
 import co.pragma.api.adapters.ResponseService;
 import co.pragma.api.dto.request.RegistrarUsuarioDTO;
-import co.pragma.api.dto.UsuarioDtoMapper;
+import co.pragma.api.mapper.UsuarioDtoMapper;
 import co.pragma.api.dto.response.UsuarioResponse;
-import co.pragma.model.rol.Permission;
-import co.pragma.model.usuario.RegistrarUsuarioCommand;
+import co.pragma.model.session.Permission;
+import co.pragma.model.usuario.command.RegistrarUsuarioCommand;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,9 @@ class UsuarioHandlerTest {
     @Mock
     private PermissionValidator permissionValidator;
 
+    @Mock
+    private DtoValidator dtoValidator;
+
     @InjectMocks
     private UsuarioHandler handler;
 
@@ -52,6 +56,7 @@ class UsuarioHandlerTest {
         when(registrarUsuarioUseCase.execute(cmd)).thenReturn(Mono.just(usuario));
         when(usuarioDtoMapper.toResponse(any(Usuario.class))).thenReturn(responseDto);
         when(responseService.createdJson(responseDto)).thenReturn(Mono.just(mock(ServerResponse.class)));
+        when(dtoValidator.validate(any(RegistrarUsuarioDTO.class))).thenReturn(Mono.just(requestDto));
 
         Mono<ServerResponse> result = handler.listenRegisterUser(request);
 

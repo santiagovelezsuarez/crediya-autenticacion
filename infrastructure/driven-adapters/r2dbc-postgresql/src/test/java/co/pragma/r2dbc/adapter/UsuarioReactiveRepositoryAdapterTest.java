@@ -1,6 +1,6 @@
 package co.pragma.r2dbc.adapter;
 
-import co.pragma.error.ErrorCode;
+import co.pragma.exception.ErrorCode;
 import co.pragma.exception.InfrastructureException;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.usuario.TipoDocumento;
@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;

@@ -1,6 +1,7 @@
 package co.pragma.api.handler;
 
 import co.pragma.api.adapters.ResponseService;
+import co.pragma.api.dto.DtoValidator;
 import co.pragma.api.dto.request.AutenticarUsuarioDTO;
 import co.pragma.api.dto.response.LoginResponseDTO;
 import co.pragma.api.security.JwtService;
@@ -32,6 +33,9 @@ class AuthHandlerTest {
     @Mock
     private ResponseService responseService;
 
+    @Mock
+    private DtoValidator dtoValidator;
+
     @InjectMocks
     private AuthHandler authHandler;
 
@@ -58,6 +62,7 @@ class AuthHandlerTest {
         when(autenticarUsuarioUseCase.execute(authDto.getEmail(), authDto.getPassword())).thenReturn(Mono.just(mockUser));
         when(jwtService.generateToken(any(Usuario.class))).thenReturn("mock_token");
         when(responseService.okJson(any(LoginResponseDTO.class))).thenReturn(Mono.just(mock(ServerResponse.class)));
+        when(dtoValidator.validate(any(AutenticarUsuarioDTO.class))).thenReturn(Mono.just(authDto));
 
         Mono<ServerResponse> result = authHandler.listenAuthenticate(request);
 

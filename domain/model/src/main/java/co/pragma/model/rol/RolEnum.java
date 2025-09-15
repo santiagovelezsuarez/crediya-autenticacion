@@ -1,6 +1,7 @@
 package co.pragma.model.rol;
 
 import co.pragma.exception.business.RolNotFoundException;
+import co.pragma.model.session.Permission;
 import lombok.Getter;
 
 import java.util.Set;

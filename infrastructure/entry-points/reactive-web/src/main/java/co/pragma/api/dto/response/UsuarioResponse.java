@@ -2,6 +2,8 @@ package co.pragma.api.dto.response;
 
 import lombok.Builder;
 
+import java.math.BigDecimal;
+
 @Builder
 public record UsuarioResponse(
         String id,
@@ -13,6 +15,6 @@ public record UsuarioResponse(
         String direccion,
         String telefono,
         String email,
-        String salarioBase,
+        BigDecimal salarioBase,
         String rol
 ) {}

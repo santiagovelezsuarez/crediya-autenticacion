@@ -1,7 +1,7 @@
 package co.pragma.api.security;
 
-import co.pragma.model.rol.Permission;
-import co.pragma.model.usuario.Session;
+import co.pragma.model.session.Permission;
+import co.pragma.model.session.Session;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -31,7 +31,7 @@ class SessionMapperTest {
     void shouldReturnDefaultWhenAuthIsNull() {
         Session session = SessionMapper.toSession(null);
 
-        assertThat(session.getUserId()).isEqualTo("");
+        assertThat(session.getUserId()).isEmpty();
         assertThat(session.getRole()).isEqualTo("PUBLIC");
     }
 

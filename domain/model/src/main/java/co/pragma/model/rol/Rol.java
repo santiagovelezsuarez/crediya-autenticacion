@@ -1,5 +1,6 @@
 package co.pragma.model.rol;
 
+import co.pragma.model.session.Permission;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

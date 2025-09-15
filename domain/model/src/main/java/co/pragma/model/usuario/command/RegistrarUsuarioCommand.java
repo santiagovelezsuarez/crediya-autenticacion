@@ -1,4 +1,4 @@
-package co.pragma.model.usuario;
+package co.pragma.model.usuario.command;
 
 import lombok.Builder;
 

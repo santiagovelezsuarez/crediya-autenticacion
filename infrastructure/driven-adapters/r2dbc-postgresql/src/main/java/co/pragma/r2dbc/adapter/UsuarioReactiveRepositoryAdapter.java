@@ -59,6 +59,14 @@ public class UsuarioReactiveRepositoryAdapter implements UsuarioRepository {
                 .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 
+    @Override
+    public Mono<Usuario> findById(UUID id) {
+        log.debug("Buscando usuario por id: {}", id);
+        return usuarioRepository.findById(id)
+                .map(mapper::toDomain)
+                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
+    }
+
     private Mono<Usuario> mapToUsuario(UsuarioEntity entity) {
         return rolRepository.findById(entity.getIdRol())
                 .map(rol -> mapper.toDomainWithRole(entity, rol))

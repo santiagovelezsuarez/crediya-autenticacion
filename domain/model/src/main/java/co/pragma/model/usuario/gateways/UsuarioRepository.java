@@ -12,4 +12,5 @@ public interface UsuarioRepository {
     Mono<Usuario> findByEmail(String email);
     Mono<Usuario> findByTipoDocumentoAndNumeroDocumento(String tipoDocumento, String numeroDocumento);
     Flux<Usuario> findByIdIn(List<UUID> userIds);
+    Mono<Usuario> findById(UUID id);
 }

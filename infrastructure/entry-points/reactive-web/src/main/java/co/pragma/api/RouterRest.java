@@ -119,7 +119,8 @@ public class RouterRest {
 
     @Bean
     public RouterFunction<ServerResponse> userQueryRoutes(UsuarioQueryHandler handler) {
-        return route(POST("/api/v1/usuarios/batch"), handler::listenGetUsuariosBatch);
+        return route(POST("/api/v1/usuarios/batch"), handler::listenGetUsuariosBatch)
+                .andRoute(GET("/api/v1/usuarios/{id}"), handler::listenGetUsuarioById);
     }
 
     @Bean

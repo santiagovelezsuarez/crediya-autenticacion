@@ -6,9 +6,11 @@ import co.pragma.model.usuario.Usuario;
 import co.pragma.r2dbc.entity.UsuarioEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UsuarioEntityMapperTest {

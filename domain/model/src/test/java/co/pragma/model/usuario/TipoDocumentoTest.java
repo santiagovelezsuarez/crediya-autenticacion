@@ -1,6 +1,7 @@
 package co.pragma.model.usuario;
 
 import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -16,8 +17,7 @@ class TipoDocumentoTest {
 
     @Test
     void shouldThrowExceptionWhenCodigoIsInvalid() {
-        IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class, () -> TipoDocumento.fromCodigo("XYZ"));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> TipoDocumento.fromCodigo("XYZ"));
 
         assertThat(exception.getMessage()).contains("documento no válido");
     }

@@ -51,6 +51,18 @@ sonar {
     }
 }
 
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'info.solidsoft.pitest'
+
+    pitest {
+        targetClasses = ['co.pragma.*']
+        targetTests = ['co.pragma.*Test']
+        pitestVersion = '1.15.0'
+        junit5PluginVersion = '1.0.0'
+    }
+}
+
 tasks.named("sonar").configure {
     dependsOn(":jacocoMergedReport")
 }

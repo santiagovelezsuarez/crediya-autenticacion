@@ -8,11 +8,10 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class PermissionValidator {
 
-    public Mono<UserContextRequest> requirePermission(UserContextRequest context, PermissionEnum requiredPermissionEnum) {
+    public Mono<Void> requirePermission(UserContextRequest context, PermissionEnum requiredPermissionEnum) {
         if (context.permissionEnums().contains(requiredPermissionEnum)) {
-            return Mono.just(context);
+            return Mono.empty();
         }
         return Mono.error(new SecurityException("Permiso denegado: " + requiredPermissionEnum));
     }
 }
-

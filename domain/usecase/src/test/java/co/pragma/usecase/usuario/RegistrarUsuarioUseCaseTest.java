@@ -6,8 +6,8 @@ import co.pragma.exception.business.RolNotFoundException;
 import co.pragma.exception.business.SalarioBaseException;
 import co.pragma.model.rol.Rol;
 import co.pragma.model.rol.gateways.RolRepository;
-import co.pragma.model.usuario.command.RegistrarUsuarioCommand;
 import co.pragma.model.usuario.Usuario;
+import co.pragma.model.usuario.command.RegistrarUsuarioCommand;
 import co.pragma.model.usuario.gateways.PasswordEncoderService;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
 import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
@@ -21,7 +21,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
 import java.math.BigDecimal;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -77,7 +79,7 @@ class RegistrarUsuarioUseCaseTest {
         StepVerifier.create(registrarUsuarioUseCase.execute(command))
                 .expectNextMatches(savedUser ->
                         savedUser.getNombres().equals("Juan") &&
-                        savedUser.getRol().getNombre().equals("ASESOR")
+                                savedUser.getRol().getNombre().equals("ASESOR")
                 )
                 .verifyComplete();
     }

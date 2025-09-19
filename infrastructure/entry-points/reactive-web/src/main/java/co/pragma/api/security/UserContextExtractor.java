@@ -5,6 +5,7 @@ import co.pragma.security.UserContextRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
@@ -19,8 +20,6 @@ public class UserContextExtractor {
     private static final String HEADER_USER_ROLE = "x-user-role";
     private static final String HEADER_USER_EMAIL = "x-user-email";
     private static final String HEADER_USER_PERMISSIONS = "x-user-permissions";
-
-    private UserContextExtractor(){}
 
     public UserContextRequest fromRequest(ServerRequest request) {
         String userId = request.headers().firstHeader(HEADER_USER_ID);

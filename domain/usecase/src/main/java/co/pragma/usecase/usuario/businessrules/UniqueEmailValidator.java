@@ -11,7 +11,8 @@ public class UniqueEmailValidator {
     private final UsuarioRepository usuarioRepository;
 
     public Mono<Void> validate(String email) {
-        return usuarioRepository.findByEmail(email)
+        return usuarioRepository
+                .findByEmail(email)
                 .flatMap(u -> Mono.error(new EmailAlreadyRegisteredException()))
                 .switchIfEmpty(Mono.empty())
                 .then();

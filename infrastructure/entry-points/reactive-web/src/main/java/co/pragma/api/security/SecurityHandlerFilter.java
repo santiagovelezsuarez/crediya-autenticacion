@@ -17,14 +17,16 @@ public class SecurityHandlerFilter {
     private final UserContextExtractor userContextExtractor;
 
     public HandlerFilterFunction<ServerResponse, ServerResponse> requirePermission(PermissionEnum permissionEnum) {
-        return (request, next) -> {
+        return (request, next) -> Mono.defer(() -> {
             UserContextRequest context = userContextExtractor.fromRequest(request);
-            return permissionValidator.requirePermission(context, permissionEnum)
-                    .then(Mono.defer(() -> {
-                        request.attributes().put("userContext", context);
-                        return next.handle(request);
-                    }));
+            if (context == null) {
+                return Mono.error(new SecurityException("User context could not be extracted"));
+            }
 
-        };
+            request.attributes().put("userContext", context);
+
+            return permissionValidator.requirePermission(context, permissionEnum)
+                    .then(next.handle(request));
+        });
     }
 }

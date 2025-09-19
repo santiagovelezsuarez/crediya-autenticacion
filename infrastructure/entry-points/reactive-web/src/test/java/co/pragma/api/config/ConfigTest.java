@@ -1,7 +1,7 @@
 package co.pragma.api.config;
 
-import co.pragma.api.handler.UsuarioHandler;
 import co.pragma.api.RouterRest;
+import co.pragma.api.handler.UsuarioHandler;
 import co.pragma.api.mapper.UsuarioDtoMapper;
 import co.pragma.api.security.SecurityHandlerFilter;
 import co.pragma.api.security.UserContextExtractor;

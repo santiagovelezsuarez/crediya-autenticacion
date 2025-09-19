@@ -6,6 +6,7 @@ import co.pragma.api.dto.response.UsuarioResponse;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.command.RegistrarUsuarioCommand;
 import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -29,19 +30,19 @@ public class UsuarioDtoMapper {
     }
 
     public RegistrarUsuarioCommand toCommand(RegistrarUsuarioDTO dto) {
-       return RegistrarUsuarioCommand.builder()
-               .nombres(dto.getNombres())
-               .apellidos(dto.getApellidos())
-               .tipoDocumento(dto.getTipoDocumento())
-               .numeroDocumento(dto.getNumeroDocumento())
-               .fechaNacimiento(LocalDate.parse(dto.getFechaNacimiento()))
-               .direccion(dto.getDireccion())
-               .telefono(dto.getTelefono())
-               .email(dto.getEmail())
-               .rawPassword(dto.getPassword())
-               .salarioBase(dto.getSalarioBase())
-               .rol(dto.getRol())
-               .build();
+        return RegistrarUsuarioCommand.builder()
+                .nombres(dto.getNombres())
+                .apellidos(dto.getApellidos())
+                .tipoDocumento(dto.getTipoDocumento())
+                .numeroDocumento(dto.getNumeroDocumento())
+                .fechaNacimiento(LocalDate.parse(dto.getFechaNacimiento()))
+                .direccion(dto.getDireccion())
+                .telefono(dto.getTelefono())
+                .email(dto.getEmail())
+                .rawPassword(dto.getPassword())
+                .salarioBase(dto.getSalarioBase())
+                .rol(dto.getRol())
+                .build();
     }
 
     public UsuarioInfoDTO toUsuarioInfoDTO(Usuario usuario) {

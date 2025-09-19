@@ -2,6 +2,7 @@ package co.pragma.api.dto;
 
 import co.pragma.api.dto.response.ErrorResponse;
 import lombok.Getter;
+
 import java.util.List;
 
 @Getter

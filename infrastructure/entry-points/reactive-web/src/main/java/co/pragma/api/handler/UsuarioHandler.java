@@ -2,10 +2,8 @@ package co.pragma.api.handler;
 
 import co.pragma.api.dto.request.RegistrarUsuarioDTO;
 import co.pragma.api.mapper.UsuarioDtoMapper;
-import co.pragma.model.session.PermissionValidator;
 import co.pragma.api.adapters.ResponseService;
 import co.pragma.api.dto.*;
-import co.pragma.model.session.Permission;
 import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +21,11 @@ public class UsuarioHandler {
     private final DtoValidator dtoValidator;
     private final ResponseService responseService;
     private final UsuarioDtoMapper usuarioDtoMapper;
-    private final PermissionValidator permissionValidator;
 
     public Mono<ServerResponse> listenRegisterUser(ServerRequest serverRequest) {
         log.debug("Petición recibida para registrar usuario");
-        return serverRequest
-                .bodyToMono(RegistrarUsuarioDTO.class)
+        return serverRequest.bodyToMono(RegistrarUsuarioDTO.class)
                 .flatMap(dtoValidator::validate)
-                .flatMap(dto -> permissionValidator.requirePermission(Permission.REGISTRAR_USUARIO).thenReturn(dto))
                 .map(usuarioDtoMapper::toCommand)
                 .flatMap(registrarUsuarioUseCase::execute)
                 .doOnNext(user -> log.trace("Usuario registrado con éxito: {}", user.getEmail()))

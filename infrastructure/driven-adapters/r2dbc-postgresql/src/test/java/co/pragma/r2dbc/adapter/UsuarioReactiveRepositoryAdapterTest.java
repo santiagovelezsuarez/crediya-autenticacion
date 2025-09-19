@@ -14,15 +14,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.List;
-import java.util.UUID;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -137,48 +131,6 @@ class UsuarioReactiveRepositoryAdapterTest {
                     assertThat(error).isInstanceOf(InfrastructureException.class);
                     assertThat(error.getMessage()).isEqualTo(ErrorCode.DB_ERROR.name());
                 })
-                .verify();
-    }
-
-    @Test
-    void shouldReturnUsuarios_WhenFound() {
-        UUID userId1 = UUID.randomUUID();
-        UUID userId2 = UUID.randomUUID();
-        List<UUID> userIds = List.of(userId1, userId2);
-
-        UsuarioEntity entity1 = UsuarioEntity.builder().id(userId1).email("user1@mail.com").build();
-        UsuarioEntity entity2 = UsuarioEntity.builder().id(userId2).email("user2@mail.com").build();
-        Usuario usuario1 = Usuario.builder().id(userId1).email("user1@mail.com").build();
-        Usuario usuario2 = Usuario.builder().id(userId2).email("user2@mail.com").build();
-
-        when(usuarioRepository.findByIdIn(userIds)).thenReturn(Flux.just(entity1, entity2));
-        when(mapper.toDomain(entity1)).thenReturn(usuario1);
-        when(mapper.toDomain(entity2)).thenReturn(usuario2);
-
-        StepVerifier.create(adapter.findByIdIn(userIds))
-                .expectNext(usuario1)
-                .expectNext(usuario2)
-                .verifyComplete();
-    }
-
-    @Test
-    void findByIdIn_shouldReturnEmptyFlux_whenRepositoryReturnsEmpty() {
-        List<UUID> userIds = List.of(UUID.randomUUID());
-        when(usuarioRepository.findByIdIn(userIds)).thenReturn(Flux.empty());
-
-        StepVerifier.create(adapter.findByIdIn(userIds))
-                .verifyComplete();
-    }
-
-    @Test
-    void shouldReturnInfrastructureException_whenFindByIdInFails() {
-        List<UUID> userIds = List.of(UUID.randomUUID());
-        when(usuarioRepository.findByIdIn(any())).thenReturn(Flux.error(new RuntimeException("DB connection error")));
-
-        StepVerifier.create(adapter.findByIdIn(userIds))
-                .expectErrorMatches(throwable ->
-                        throwable instanceof InfrastructureException &&
-                                throwable.getMessage().equals(ErrorCode.DB_ERROR.name()))
                 .verify();
     }
 }

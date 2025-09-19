@@ -7,6 +7,7 @@ public enum ErrorCode {
     USUARIO_NOT_FOUND("Usuario no encontrado."),
     CREDENCIALES_INVALIDAS("Usuario o contraseña inválidos."),
     ROL_NOT_FOUND("El rol especificado no existe."),
+    UNAUTHORIZED("No se encontró una sesión autenticada"),
     FORBIDDEN("No tiene permisos para realizar esta acción."),
     TECHNICAL_ERROR("Ocurrió un error técnico, intente más tarde."),
     INVALID_INPUT("Existen errores de validación."),

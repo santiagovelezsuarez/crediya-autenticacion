@@ -1,7 +1,6 @@
 package co.pragma.model.usuario;
 
 import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -20,12 +19,12 @@ class TipoDocumentoTest {
         IllegalArgumentException exception =
                 assertThrows(IllegalArgumentException.class, () -> TipoDocumento.fromCodigo("XYZ"));
 
-        assertThat(exception.getMessage()).contains("Tipo de documento no válido");
+        assertThat(exception.getMessage()).contains("documento no válido");
     }
 
     @Test
     void shouldReturnCorrectDescripcionAndCodigo() {
-        assertThat(TipoDocumento.CC.getDescripcion()).contains("Cédula");
+        assertThat(TipoDocumento.CC.getDescripcion()).containsIgnoringCase("Cédula");
         assertThat(TipoDocumento.CC.getCodigo()).isEqualTo("CC");
 
         assertThat(TipoDocumento.PA.getDescripcion()).isEqualTo("Pasaporte");

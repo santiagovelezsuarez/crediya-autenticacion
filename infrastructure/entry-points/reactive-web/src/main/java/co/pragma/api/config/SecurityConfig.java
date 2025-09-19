@@ -1,25 +1,19 @@
 package co.pragma.api.config;
 
-import co.pragma.api.security.JwtService;
+import co.pragma.usecase.security.PermissionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.reactive.CorsWebFilter;
 
 @Configuration
-@EnableWebFluxSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtService jwtService;
-
     @Bean
-    public org.springframework.web.cors.reactive.CorsWebFilter corsFilter() {
+    public CorsWebFilter corsFilter() {
         var config = new org.springframework.web.cors.CorsConfiguration();
         config.addAllowedOrigin("http://localhost:8080/swagger-ui");
         config.addAllowedMethod("*");
@@ -33,22 +27,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/api/*/login").permitAll()
-                        .pathMatchers("/api/health/**").permitAll()
-                        .pathMatchers("/swagger-ui/**").permitAll()
-                        .pathMatchers("/v3/api-docs/**").permitAll()
-                        .anyExchange().authenticated()
-                )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtService), SecurityWebFiltersOrder.AUTHENTICATION)
-                .build();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public PermissionValidator permissionValidator() {
+        return new PermissionValidator();
     }
 }

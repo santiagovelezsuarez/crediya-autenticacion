@@ -10,10 +10,8 @@ import co.pragma.r2dbc.mapper.UsuarioEntityMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import java.util.List;
-import java.util.UUID;
+
 
 @Slf4j
 @Repository
@@ -48,22 +46,6 @@ public class UsuarioReactiveRepositoryAdapter implements UsuarioRepository {
         return usuarioRepository.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento)
                 .flatMap(this::mapToUsuario)
                 .doOnNext(u -> log.trace("findByTipoDocumentoAndNumeroDocumento - Usuario encontrado: {}", u))
-                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
-    }
-
-    @Override
-    public Flux<Usuario> findByIdIn(List<UUID> userIds) {
-        log.debug("Buscando usuarios por id in: {}", userIds);
-        return usuarioRepository.findByIdIn(userIds)
-                .map(mapper::toDomain)
-                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
-    }
-
-    @Override
-    public Mono<Usuario> findById(UUID id) {
-        log.debug("Buscando usuario por id: {}", id);
-        return usuarioRepository.findById(id)
-                .map(mapper::toDomain)
                 .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 

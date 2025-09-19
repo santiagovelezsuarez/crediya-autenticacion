@@ -1,12 +1,11 @@
 package co.pragma.api.handler;
 
 import co.pragma.api.dto.DtoValidator;
-import co.pragma.model.session.PermissionValidator;
+import co.pragma.usecase.security.PermissionValidator;
 import co.pragma.api.adapters.ResponseService;
 import co.pragma.api.dto.request.RegistrarUsuarioDTO;
 import co.pragma.api.mapper.UsuarioDtoMapper;
 import co.pragma.api.dto.response.UsuarioResponse;
-import co.pragma.model.session.Permission;
 import co.pragma.model.usuario.command.RegistrarUsuarioCommand;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
@@ -51,7 +50,7 @@ class UsuarioHandlerTest {
 
         ServerRequest request = mock(ServerRequest.class);
         when(request.bodyToMono(RegistrarUsuarioDTO.class)).thenReturn(Mono.just(requestDto));
-        when(permissionValidator.requirePermission(Permission.REGISTRAR_USUARIO)).thenReturn(Mono.empty());
+       // when(permissionValidator.requirePermission(Permission.REGISTRAR_USUARIO)).thenReturn(Mono.empty());
         when(usuarioDtoMapper.toCommand(any(RegistrarUsuarioDTO.class))).thenReturn(cmd);
         when(registrarUsuarioUseCase.execute(cmd)).thenReturn(Mono.just(usuario));
         when(usuarioDtoMapper.toResponse(any(Usuario.class))).thenReturn(responseDto);

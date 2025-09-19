@@ -1,18 +1,17 @@
 package co.pragma.api;
 
-import co.pragma.api.dto.request.AutenticarUsuarioDTO;
 import co.pragma.api.dto.request.RegistrarUsuarioDTO;
 import co.pragma.api.dto.response.ErrorResponse;
-import co.pragma.api.dto.response.LoginResponseDTO;
 import co.pragma.api.dto.response.UsuarioResponse;
-import co.pragma.api.handler.AuthHandler;
 import co.pragma.api.handler.UsuarioHandler;
-import co.pragma.api.handler.UsuarioQueryHandler;
+import co.pragma.api.security.SecurityHandlerFilter;
+import co.pragma.security.PermissionEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
 import org.springframework.context.annotation.Bean;
@@ -21,12 +20,15 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
+@RequiredArgsConstructor
 public class RouterRest {
+
+    private final SecurityHandlerFilter securityFilter;
 
     @Bean
     @RouterOperations({
@@ -82,45 +84,10 @@ public class RouterRest {
             )
     })
     public RouterFunction<ServerResponse> userRoutes(UsuarioHandler handler) {
-        return route(POST("/api/v1/usuarios"), handler::listenRegisterUser);
-    }
-
-    @Bean
-    @RouterOperations({
-            @RouterOperation(
-                    path = "/api/v1/login",
-                    produces = {MediaType.APPLICATION_JSON_VALUE},
-                    method = RequestMethod.POST,
-                    beanClass = UsuarioHandler.class,
-                    beanMethod = "listenAuthenticate",
-                    operation = @Operation(
-                            operationId = "AutenticarUsuario",
-                            summary = "Autenticar usuario y generar token JWT",
-                            description = "Valida las credenciales del usuario y genera un token JWT para sesiones autenticadas",
-                            tags = {"Autenticación"},
-                            requestBody = @RequestBody(
-                                    required = true,
-                                    content = @Content(schema = @Schema(implementation = AutenticarUsuarioDTO.class))
-                            ),
-                            responses = {
-                                    @ApiResponse(responseCode = "200", description = "Autenticación exitosa, token generado",
-                                            content = @Content(schema = @Schema(implementation = LoginResponseDTO.class))),
-                                    @ApiResponse(responseCode = "401", description = "Credenciales inválidas",
-                                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                                    @ApiResponse(responseCode = "500", description = "Error interno del servidor",
-                                            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-                            }
-                    )
-            )
-    })
-    public RouterFunction<ServerResponse> authRoutes(AuthHandler handler) {
-        return route(POST("/api/v1/login"), handler::listenAuthenticate);
-    }
-
-    @Bean
-    public RouterFunction<ServerResponse> userQueryRoutes(UsuarioQueryHandler handler) {
-        return route(POST("/api/v1/usuarios/batch"), handler::listenGetUsuariosBatch)
-                .andRoute(GET("/api/v1/usuarios/{id}"), handler::listenGetUsuarioById);
+        return route()
+                .POST("/api/v1/usuarios", handler::listenRegisterUser)
+                .filter(securityFilter.requirePermission(PermissionEnum.REGISTRAR_USUARIO))
+                .build();
     }
 
     @Bean

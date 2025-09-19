@@ -1,6 +1,8 @@
 package co.pragma.model.usuario;
+
 import co.pragma.model.rol.Rol;
 import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;

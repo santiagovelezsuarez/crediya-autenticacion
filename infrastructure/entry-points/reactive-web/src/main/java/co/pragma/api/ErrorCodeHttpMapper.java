@@ -3,7 +3,9 @@ package co.pragma.api;
 import co.pragma.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+
 import java.util.Map;
+
 import static java.util.Map.entry;
 
 @Component

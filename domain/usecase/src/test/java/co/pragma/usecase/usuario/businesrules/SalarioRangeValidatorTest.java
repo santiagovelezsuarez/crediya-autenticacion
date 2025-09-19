@@ -5,6 +5,7 @@ import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
+
 import java.math.BigDecimal;
 
 class SalarioRangeValidatorTest {

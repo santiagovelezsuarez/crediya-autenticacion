@@ -1,10 +1,8 @@
 package co.pragma.config;
 
-import co.pragma.model.rol.gateways.RolRepository;
-import co.pragma.model.usuario.gateways.UsuarioRepository;
-import co.pragma.usecase.usuario.AutenticarUsuarioUseCase;
-import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
-import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
+import co.pragma.model.usuario.gateways.PasswordEncoderService;
+import co.pragma.usecase.usuario.businessrules.UniqueDocumentoIdentidadValidator;
+import co.pragma.usecase.usuario.businessrules.UniqueEmailValidator;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,11 +10,16 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import co.pragma.model.rol.gateways.RolRepository;
+import co.pragma.model.usuario.gateways.UsuarioRepository;
+import co.pragma.usecase.usuario.AutenticarUsuarioUseCase;
+import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
+import co.pragma.usecase.usuario.businessrules.SalarioRangeValidator;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class UseCasesConfigTest {
-
     @Test
     void testUseCaseBeansExist() {
         try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(TestConfig.class)) {
@@ -39,11 +42,6 @@ class UseCasesConfigTest {
     static class TestConfig {
 
         @Bean
-        public MyUseCase myUseCase() {
-            return new MyUseCase();
-        }
-
-        @Bean
         public UsuarioRepository usuarioRepository() {
             return Mockito.mock(UsuarioRepository.class);
         }
@@ -60,7 +58,7 @@ class UseCasesConfigTest {
 
         @Bean
         public AutenticarUsuarioUseCase autenticarUsuarioUseCase() {
-            return  Mockito.mock(AutenticarUsuarioUseCase.class);
+            return Mockito.mock(AutenticarUsuarioUseCase.class);
         }
 
         @Bean
@@ -69,14 +67,18 @@ class UseCasesConfigTest {
         }
 
         @Bean
-        public RegistrarUsuarioUseCase registrarUsuarioUseCase() {
-            return  Mockito.mock(RegistrarUsuarioUseCase.class);
+        public UniqueEmailValidator uniqueEmailValidator(UsuarioRepository usuarioRepository) {
+            return Mockito.mock(UniqueEmailValidator.class);
         }
-    }
 
-    static class MyUseCase {
-        public String execute() {
-            return "MyUseCase Test";
+        @Bean
+        public UniqueDocumentoIdentidadValidator uniqueDocumentoIdentidadValidator(UsuarioRepository usuarioRepository) {
+            return Mockito.mock(UniqueDocumentoIdentidadValidator.class);
+        }
+
+        @Bean
+        public PasswordEncoderService passwordEncoderService() {
+            return Mockito.mock(PasswordEncoderService.class);
         }
     }
 }

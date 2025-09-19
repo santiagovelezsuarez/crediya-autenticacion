@@ -10,4 +10,4 @@ public record UsuarioInfoDTO(
         String email,
         String nombre,
         BigDecimal salarioBase
-){}
+) {}

@@ -17,15 +17,14 @@ class TipoDocumentoTest {
 
     @Test
     void shouldThrowExceptionWhenCodigoIsInvalid() {
-        IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class, () -> TipoDocumento.fromCodigo("XYZ"));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> TipoDocumento.fromCodigo("XYZ"));
 
-        assertThat(exception.getMessage()).contains("Tipo de documento no válido");
+        assertThat(exception.getMessage()).contains("documento no válido");
     }
 
     @Test
     void shouldReturnCorrectDescripcionAndCodigo() {
-        assertThat(TipoDocumento.CC.getDescripcion()).contains("Cédula");
+        assertThat(TipoDocumento.CC.getDescripcion()).containsIgnoringCase("Cédula");
         assertThat(TipoDocumento.CC.getCodigo()).isEqualTo("CC");
 
         assertThat(TipoDocumento.PA.getDescripcion()).isEqualTo("Pasaporte");

@@ -5,5 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface RolRepository {
     Mono<Rol> findById(Integer id);
+
     Mono<Rol> findByNombre(String name);
 }

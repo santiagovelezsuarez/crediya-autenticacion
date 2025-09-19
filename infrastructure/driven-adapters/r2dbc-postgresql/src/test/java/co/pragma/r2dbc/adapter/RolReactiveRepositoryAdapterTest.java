@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivecommons.utils.ObjectMapper;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -54,9 +55,7 @@ class RolReactiveRepositoryAdapterTest {
     @Test
     void findByIdShouldReturnEmptyWhenNotFound() {
         when(repository.findById(99)).thenReturn(Mono.empty());
-
-        StepVerifier.create(adapter.findById(99))
-                .verifyComplete();
+        StepVerifier.create(adapter.findById(99)).verifyComplete();
     }
 
 
@@ -71,13 +70,14 @@ class RolReactiveRepositoryAdapterTest {
     }
 
     @Test
-    void shouldReturnInfrastructureExceptionWhenFindByIdails() {
-        when(repository.findById(anyInt())).thenReturn(Mono.error(new RuntimeException("DB error")));
+    void shouldReturnInfrastructureExceptionWhenFindByIdFails() {
+        when(repository.findById(anyInt()))
+                .thenReturn(Mono.error(new RuntimeException("DB error")));
 
         StepVerifier.create(adapter.findById(1))
                 .expectErrorMatches(throwable ->
                         throwable instanceof InfrastructureException &&
-                        throwable.getMessage().equals(ErrorCode.DB_ERROR.name())
+                                throwable.getMessage().equals(ErrorCode.DB_ERROR.name())
                 )
                 .verify();
 
@@ -86,12 +86,13 @@ class RolReactiveRepositoryAdapterTest {
 
     @Test
     void shouldReturnInfrastructureExceptionWhenFindByNombreFails() {
-        when(repository.findByNombre(any(String.class))).thenReturn(Mono.error(new RuntimeException("DB error")));
+        when(repository.findByNombre(any(String.class)))
+                .thenReturn(Mono.error(new RuntimeException("DB error")));
 
         StepVerifier.create(adapter.findByNombre("ADMIN"))
                 .expectErrorMatches(throwable ->
                         throwable instanceof InfrastructureException &&
-                        throwable.getMessage().contains(ErrorCode.DB_ERROR.name())
+                                throwable.getMessage().equals(ErrorCode.DB_ERROR.name())
                 )
                 .verify();
 

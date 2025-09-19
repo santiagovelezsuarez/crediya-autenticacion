@@ -1,19 +1,18 @@
 package co.pragma.r2dbc.adapter;
 
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import co.pragma.exception.ErrorCode;
 import co.pragma.exception.InfrastructureException;
 import co.pragma.model.usuario.Usuario;
 import co.pragma.model.usuario.gateways.UsuarioRepository;
-import co.pragma.r2dbc.repository.UsuarioReactiveRepository;
 import co.pragma.r2dbc.entity.UsuarioEntity;
 import co.pragma.r2dbc.mapper.UsuarioEntityMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import java.util.List;
-import java.util.UUID;
+import co.pragma.r2dbc.repository.UsuarioReactiveRepository;
 
 @Slf4j
 @Repository
@@ -29,7 +28,7 @@ public class UsuarioReactiveRepositoryAdapter implements UsuarioRepository {
         log.debug("Registrando usuario: {}", usuario);
         return usuarioRepository.save(mapper.toEntity(usuario))
                 .flatMap(this::mapToUsuario)
-                .doOnNext(u -> log.trace("Usuario registrado con éxito: {}", u.getEmail()))
+                .doOnNext(u -> log.trace("save - Usuario registrado con éxito: {}", u.getEmail()))
                 .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 
@@ -51,25 +50,9 @@ public class UsuarioReactiveRepositoryAdapter implements UsuarioRepository {
                 .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
     }
 
-    @Override
-    public Flux<Usuario> findByIdIn(List<UUID> userIds) {
-        log.debug("Buscando usuarios por id in: {}", userIds);
-        return usuarioRepository.findByIdIn(userIds)
-                .map(mapper::toDomain)
-                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
-    }
-
-    @Override
-    public Mono<Usuario> findById(UUID id) {
-        log.debug("Buscando usuario por id: {}", id);
-        return usuarioRepository.findById(id)
-                .map(mapper::toDomain)
-                .onErrorMap(ex -> new InfrastructureException(ErrorCode.DB_ERROR.name(), ex));
-    }
-
     private Mono<Usuario> mapToUsuario(UsuarioEntity entity) {
         return rolRepository.findById(entity.getIdRol())
                 .map(rol -> mapper.toDomainWithRole(entity, rol))
-                .switchIfEmpty(Mono.just(mapper.toDomainWithRole(entity, null)));
+                .defaultIfEmpty(mapper.toDomainWithRole(entity, null));
     }
 }

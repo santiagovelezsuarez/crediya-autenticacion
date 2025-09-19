@@ -4,8 +4,9 @@ import co.pragma.api.ErrorCodeHttpMapper;
 import co.pragma.api.dto.DtoValidationException;
 import co.pragma.api.dto.response.ErrorResponse;
 import co.pragma.exception.ErrorCode;
-import co.pragma.exception.*;
+import co.pragma.exception.InfrastructureException;
 import co.pragma.exception.business.BusinessException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.*;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
-import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -48,25 +49,29 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
     private Mono<ServerResponse> buildErrorResponse(ServerRequest request) {
         return Mono.error(getError(request))
                 .onErrorResume(BusinessException.class, ex -> handleBusinessException(ex, request))
+                .onErrorResume(SecurityException.class, ex -> handleSecurityException(request))
                 .onErrorResume(InfrastructureException.class, ex -> handleInfrastructureException(request))
                 .onErrorResume(DtoValidationException.class, ex -> handleValidationException(ex, request))
                 .onErrorResume(ServerWebInputException.class, ex -> handleWebInputException(request))
                 .onErrorResume(ex -> handleDefaultException(request)).cast(ServerResponse.class);
     }
 
-    private Mono<ServerResponse>  handleBusinessException(BusinessException ex, ServerRequest request) {
+    private Mono<ServerResponse> handleBusinessException(BusinessException ex, ServerRequest request) {
         HttpStatus status = errorCodeHttpMapper.toHttpStatus(ex.getCode());
-
         return buildResponse(ErrorContext.of(request, status, ex.getCode(), ex.getMessage()));
     }
 
-    private Mono<ServerResponse>  handleInfrastructureException(ServerRequest request) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+    private Mono<ServerResponse> handleSecurityException(ServerRequest request) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        return buildResponse(ErrorContext.of(request, status, ErrorCode.FORBIDDEN));
+    }
 
+    private Mono<ServerResponse> handleInfrastructureException(ServerRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         return buildResponse(ErrorContext.of(request, status, ErrorCode.TECHNICAL_ERROR));
     }
 
-    private Mono<ServerResponse>  handleValidationException(DtoValidationException ex, ServerRequest request) {
+    private Mono<ServerResponse> handleValidationException(DtoValidationException ex, ServerRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         List<ErrorResponse.FieldError> fieldErrors = ex.getErrors().stream()
                 .map(err -> new ErrorResponse.FieldError(err.getField(), err.getMessage()))
@@ -76,19 +81,18 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
 
     }
 
-    private Mono<ServerResponse>  handleWebInputException(ServerRequest request) {
+    private Mono<ServerResponse> handleWebInputException(ServerRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         return buildResponse(ErrorContext.of(request, status, ErrorCode.INVALID_REQUEST));
     }
 
-    private Mono<ServerResponse>  handleDefaultException(ServerRequest request) {
+    private Mono<ServerResponse> handleDefaultException(ServerRequest request) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         return buildResponse(ErrorContext.of(request, status, ErrorCode.INTERNAL_SERVER_ERROR));
     }
 
     private Mono<ServerResponse> buildResponse(ErrorContext context) {
         ErrorResponse body = ErrorResponseFactory.from(context);
-
         return ServerResponse.status(context.status())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body);

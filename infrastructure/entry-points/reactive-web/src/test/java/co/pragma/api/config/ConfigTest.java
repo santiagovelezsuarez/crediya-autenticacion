@@ -1,11 +1,11 @@
 package co.pragma.api.config;
 
-import co.pragma.api.handler.AuthHandler;
-import co.pragma.api.handler.UsuarioHandler;
 import co.pragma.api.RouterRest;
+import co.pragma.api.handler.UsuarioHandler;
 import co.pragma.api.mapper.UsuarioDtoMapper;
-import co.pragma.api.handler.UsuarioQueryHandler;
-import co.pragma.api.security.JwtService;
+import co.pragma.api.security.SecurityHandlerFilter;
+import co.pragma.api.security.UserContextExtractor;
+import co.pragma.usecase.security.PermissionValidator;
 import co.pragma.usecase.usuario.RegistrarUsuarioUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @ContextConfiguration(classes = {RouterRest.class, UsuarioHandler.class})
 @WebFluxTest
-@Import({SecurityConfig.class, CorsConfig.class, SecurityHeadersConfig.class})
+@Import({SecurityConfig.class, CorsConfig.class, SecurityHeadersConfig.class, SecurityHandlerFilter.class})
 class ConfigTest {
 
     @Autowired
@@ -27,19 +27,16 @@ class ConfigTest {
     private UsuarioHandler usuarioHandler;
 
     @MockitoBean
-    private UsuarioQueryHandler usuarioQueryHandler;
-
-    @MockitoBean
-    private AuthHandler authHandler;
-
-    @MockitoBean
-    private JwtService jwtService;
-
-    @MockitoBean
     private RegistrarUsuarioUseCase registrarUsuarioUseCase;
 
     @MockitoBean
     private UsuarioDtoMapper usuarioDtoMapper;
+
+    @MockitoBean
+    private PermissionValidator permissionValidator;
+
+    @MockitoBean
+    private UserContextExtractor userContextExtractor;
 
     @Test
     void corsConfigurationShouldAllowOrigins() {
@@ -55,5 +52,4 @@ class ConfigTest {
                 .expectHeader().valueEquals("Pragma", "no-cache")
                 .expectHeader().valueEquals("Referrer-Policy", "strict-origin-when-cross-origin");
     }
-
 }

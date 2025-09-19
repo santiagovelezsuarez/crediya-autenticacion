@@ -13,7 +13,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 public class RolEntity {
     @Id
-    @Column("id_rol" )
+    @Column("id_rol")
     private Integer id;
     private String nombre;
     private String descripcion;

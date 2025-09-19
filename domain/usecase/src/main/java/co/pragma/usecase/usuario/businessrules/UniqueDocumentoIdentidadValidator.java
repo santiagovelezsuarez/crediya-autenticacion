@@ -11,7 +11,8 @@ public class UniqueDocumentoIdentidadValidator {
     private final UsuarioRepository usuarioRepository;
 
     public Mono<Void> validate(String tipoDocumento, String numeroDocumento) {
-        return usuarioRepository.findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento)
+        return usuarioRepository
+                .findByTipoDocumentoAndNumeroDocumento(tipoDocumento, numeroDocumento)
                 .flatMap(u -> Mono.error(new DocumentoIdentidadAlreadyRegisteredException()))
                 .switchIfEmpty(Mono.empty())
                 .then();

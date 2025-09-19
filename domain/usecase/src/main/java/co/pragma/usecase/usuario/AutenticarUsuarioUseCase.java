@@ -14,7 +14,8 @@ public class AutenticarUsuarioUseCase {
     private final PasswordEncoderService passwordEncoderService;
 
     public Mono<Usuario> execute(String email, String password) {
-        return userRepository.findByEmail(email)
+        return userRepository
+                .findByEmail(email)
                 .switchIfEmpty(Mono.error(new AuthenticationException()))
                 .flatMap(usuario -> validatePassword(usuario, password));
     }

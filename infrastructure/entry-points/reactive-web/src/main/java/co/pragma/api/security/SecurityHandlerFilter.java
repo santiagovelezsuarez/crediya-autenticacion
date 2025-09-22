@@ -23,10 +23,13 @@ public class SecurityHandlerFilter {
                 return Mono.error(new SecurityException("User context could not be extracted"));
             }
 
-            request.attributes().put("userContext", context);
-
             return permissionValidator.requirePermission(context, permissionEnum)
-                    .then(next.handle(request));
+                    .then(next.handle(request)
+                            .contextWrite(ctx -> {
+                                if (context.userId() != null)
+                                    return ctx.put("userId", context.userId());
+                                return ctx;
+                            }));
         });
     }
 }

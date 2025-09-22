@@ -1,4 +1,4 @@
-package co.pragma.api.adapters;
+package co.pragma.api.adapter;
 
 import co.pragma.model.usuario.gateways.PasswordEncoderService;
 import lombok.RequiredArgsConstructor;

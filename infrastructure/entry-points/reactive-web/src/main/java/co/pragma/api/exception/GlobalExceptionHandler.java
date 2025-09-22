@@ -114,6 +114,9 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
         if (ex instanceof BusinessException be)
             log.warn("BusinessException at {} {}: {} - code={}", method, path, be.getMessage(), be.getCode());
 
+        else if (ex instanceof SecurityException se)
+            log.warn("Acceso denegado en {} {}: {}", method, path, se.getMessage());
+
         else if (ex instanceof InfrastructureException ie)
             log.error("InfrastructureException at {} {}: {} (cause: {})", method, path, ie.getMessage(), rootCauseMsg);
 

@@ -7,7 +7,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-public interface UsuarioReactiveRepository extends ReactiveCrudRepository<UsuarioEntity, UUID>, ReactiveQueryByExampleExecutor<UsuarioEntity> {
+public interface UsuarioReactiveRepository
+        extends ReactiveCrudRepository<UsuarioEntity, UUID>, ReactiveQueryByExampleExecutor<UsuarioEntity> {
     Mono<UsuarioEntity> findByEmail(String email);
 
     Mono<UsuarioEntity> findByTipoDocumentoAndNumeroDocumento(String tipoDocumento, String numeroDocumento);

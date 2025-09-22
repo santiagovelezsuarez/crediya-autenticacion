@@ -95,6 +95,7 @@ tasks.register('jacocoMergedReport', JacocoReport) {
                 '**/Main*.*',
                 '**/*MapperImpl*',
                 '**/*Enum*',
+                '**/*Config*',
                 'co/pragma/api/dto/**',
                 'co/pragma/api/dto/response/**',
                 'co/pragma/model/usuario/command/**',

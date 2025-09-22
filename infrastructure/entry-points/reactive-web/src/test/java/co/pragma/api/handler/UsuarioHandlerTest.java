@@ -1,6 +1,6 @@
 package co.pragma.api.handler;
 
-import co.pragma.api.adapters.ResponseService;
+import co.pragma.api.adapter.ResponseService;
 import co.pragma.api.dto.DtoValidator;
 import co.pragma.api.dto.request.RegistrarUsuarioDTO;
 import co.pragma.api.dto.response.UsuarioResponse;

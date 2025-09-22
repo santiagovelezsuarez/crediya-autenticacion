@@ -1,4 +1,4 @@
-package co.pragma.api.adapters;
+package co.pragma.api.adapter;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
